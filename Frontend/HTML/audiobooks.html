@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auston - Audio Books</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts (Poppins) and Material Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/sidebar.css">
+    <link rel="stylesheet" href="../CSS/topbar.css">
+    <link rel="stylesheet" href="../CSS/audiobooks.css">
+</head>
+
+<body>
+    <div class="app">
+         <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+             <div id="topbar-placeholder"></div>
+
+            <section class="content-area">
+                <section class="left-panel">
+                    <!-- Continue Listening Section -->
+                    <section class="section">
+                        <h2>Continue Listening</h2>
+                        <div class="books-grid" id="continue-listening-container">
+                            <!-- Books will be rendered here by JavaScript -->
+                        </div>
+                    </section>
+
+                    <!-- Recommended Section -->
+                    <section class="section">
+                        <h2>Recommended</h2>
+                        <div class="books-grid" id="recommended-container">
+                            <!-- Books will be rendered here by JavaScript -->
+                        </div>
+                    </section>
+
+                    <!-- Browse Section -->
+                    <section class="section">
+                        <h2>Browse</h2>
+                        <div class="category-filters" id="category-filters">
+                            <button class="active" data-category="All">All</button>
+                            <button data-category="General">General</button>
+                            <button data-category="Business">Business</button>
+                            <button data-category="IT & CS">IT & CS</button>
+                            <button data-category="Pass Papers">Pass Papers</button>
+                            <button data-category="Projects">Projects</button>
+                            <button data-category="Research">Research</button>
+                        </div>
+                        <div class="books-grid" id="browse-container">
+                            <!-- Books will be rendered here by JavaScript -->
+                        </div>
+                    </section>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <!-- Audio Player Modal -->
+    <div id="audio-player-modal" class="modal">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="modal-control-btn" style="position: absolute; top: 15px; right: 15px;">
+                <span class="material-icons">close</span>
+            </button>
+
+            <img id="modal-image" src="" alt="Book Cover" class="modal-image">
+            <h3 id="modal-title" class="modal-title"></h3>
+            <p id="modal-author" class="modal-author"></p>
+
+            <div class="modal-audio-controls">
+                <div class="modal-progress-container">
+                    <span id="modal-current-time" class="time">0:00</span>
+                    <div class="modal-progress-bar">
+                        <div id="modal-progress" class="modal-progress"></div>
+                    </div>
+                    <span id="modal-duration" class="time">0:00</span>
+                </div>
+
+                <div class="modal-controls">
+                    <button id="modal-rewind-btn" class="modal-control-btn">
+                        <span class="material-icons">replay_10</span>
+                    </button>
+                    <button id="modal-play-pause-btn" class="modal-play-btn">
+                        <span id="modal-play-icon" class="material-icons">play_arrow</span>
+                    </button>
+                    <button id="modal-forward-btn" class="modal-control-btn">
+                        <span class="material-icons">forward_10</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- In: audiobooks.html (at the bottom of the <body> tag) -->
+
+<script src="../config/appConfig.js"></script>
+<script>
+    // --- CONFIG & DOM ELEMENTS ---
+    const API_BASE_URL = `${backendDomain}/api/books`;
+    const token = localStorage.getItem('mock_token');
+    
+    const continueContainer = document.getElementById('continue-listening-container');
+    const recommendedContainer = document.getElementById('recommended-container');
+    const browseContainer = document.getElementById('browse-container');
+    const categoryFilters = document.getElementById('category-filters');
+
+    // Modal elements
+    const audioPlayerModal = document.getElementById('audio-player-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const modalImage = document.getElementById('modal-image');
+    const modalTitle = document.getElementById('modal-title');
+    const modalAuthor = document.getElementById('modal-author');
+    const modalPlayPauseBtn = document.getElementById('modal-play-pause-btn');
+    const modalPlayIcon = document.getElementById('modal-play-icon');
+    const modalProgress = document.getElementById('modal-progress');
+    const modalCurrentTime = document.getElementById('modal-current-time');
+    const modalDuration = document.getElementById('modal-duration');
+    const modalRewindBtn = document.getElementById('modal-rewind-btn');
+    const modalForwardBtn = document.getElementById('modal-forward-btn');
+
+    // --- STATE ---
+    let allAudiobooks = [];
+    let activeAudioElement = null;
+
+    // --- HELPER FUNCTIONS ---
+    function sanitizeHTML(str) {
+        if (!str) return '';
+        const temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML;
+    }
+
+    function formatTime(seconds) {
+        if (isNaN(seconds) || seconds < 0) return "0:00";
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
+
+    // --- DATA FETCHING ---
+    async function fetchAllAudiobooks() {
+        if (!token) {
+            document.body.innerHTML = '<h1>Access Denied. Please log in.</h1>';
+            return;
+        }
+        try {
+            const privateAudiobooksPromise = fetch(`${API_BASE_URL}?hasAudio=true`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(res => res.ok ? res.json() : []);
+
+            const publicAudiobooksPromise = fetch(`${API_BASE_URL}/audiobooks`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(res => res.ok ? res.json() : []);
+
+            const [privateAudiobooks, publicAudiobooks] = await Promise.all([
+                privateAudiobooksPromise,
+                publicAudiobooksPromise
+            ]);
+
+            allAudiobooks = [...privateAudiobooks, ...publicAudiobooks].filter(b => b && b._id);
+            
+            renderBooks('continue', continueContainer, 4);
+            renderBooks('recommended', recommendedContainer, 4, true);
+            renderBooks('browse', browseContainer, null, 'All');
+
+        } catch (error) {
+            console.error("Fetch error:", error);
+            browseContainer.innerHTML = `<p class="text-red-500">${error.message}</p>`;
+        }
+    }
+
+    // --- UI RENDERING ---
+    function createBookCard(book) {
+        const audioSource = book.audioUrl.startsWith('http') ? book.audioUrl : `${backendDomain}${book.audioUrl}`;
+        const coverSource = book.coverUrl.startsWith('http') ? book.coverUrl : `${backendDomain}${book.coverUrl}`;
+        
+        const card = document.createElement('div');
+        card.className = 'book-card';
+        card.dataset.bookId = book._id;
+        card.innerHTML = `
+            <audio id="audio-${book._id}" src="${audioSource}" preload="metadata"></audio>
+            <img src="${coverSource}" alt="${sanitizeHTML(book.title)} cover" />
+            <div class="title">${sanitizeHTML(book.title)}</div>
+            <div class="author">${sanitizeHTML(book.author)}</div>
+            <div class="audio-controls">
+                <span class="time" id="current-time-${book._id}">0:00</span>
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar-${book._id}"></div>
+                </div>
+                <button class="play-btn" data-book-id="${book._id}">
+                    <span class="material-icons" id="play-icon-${book._id}">play_arrow</span>
+                </button>
+            </div>
+        `;
+        return card;
+    }
+
+    function renderBooks(section, container, limit, shuffle = false, category = 'All') {
+        container.innerHTML = '';
+        let booksToRender = [...allAudiobooks];
+
+        if (shuffle) {
+            booksToRender.sort(() => Math.random() - 0.5);
+        }
+
+        if (category !== 'All') {
+            booksToRender = booksToRender.filter(book => book.category === category);
+        }
+
+        if (limit) {
+            booksToRender = booksToRender.slice(0, limit);
+        }
+
+        if (booksToRender.length === 0) {
+            container.innerHTML = `<p class="text-gray-500 col-span-full">No audiobooks found.</p>`;
+            return;
+        }
+
+        booksToRender.forEach(book => {
+            container.appendChild(createBookCard(book));
+        });
+        attachAudioListeners();
+    }
+
+    // --- AUDIO PLAYER LOGIC ---
+    function attachAudioListeners() {
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.removeEventListener('timeupdate', handleTimeUpdate);
+            audio.removeEventListener('ended', handleAudioEnd);
+            audio.removeEventListener('loadedmetadata', handleMetadataLoaded);
+            audio.addEventListener('timeupdate', handleTimeUpdate);
+            audio.addEventListener('ended', handleAudioEnd);
+            audio.addEventListener('loadedmetadata', handleMetadataLoaded);
+        });
+    }
+
+    function handleTimeUpdate(event) {
+        const audio = event.target;
+        const bookId = audio.id.split('-')[1];
+        const progressBar = document.getElementById(`progress-bar-${bookId}`);
+        const currentTimeSpan = document.getElementById(`current-time-${bookId}`);
+        if (progressBar && currentTimeSpan && audio.duration) {
+            localStorage.setItem(`audio-progress-${bookId}`, audio.currentTime);
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+            currentTimeSpan.textContent = formatTime(audio.currentTime);
+            if (audio === activeAudioElement) {
+                document.getElementById('modal-progress').style.width = `${progress}%`;
+                document.getElementById('modal-current-time').textContent = formatTime(audio.currentTime);
+            }
+        }
+    }
+    
+    function handleAudioEnd(event) {
+        const audio = event.target;
+        const bookId = audio.id.split('-')[1];
+        const playIcon = document.getElementById(`play-icon-${bookId}`);
+        if (playIcon) playIcon.textContent = 'play_arrow';
+        if (audio === activeAudioElement) {
+            document.getElementById('modal-play-icon').textContent = 'play_arrow';
+            activeAudioElement = null;
+        }
+    }
+
+    function handleMetadataLoaded(event) {
+        const audio = event.target;
+        const bookId = audio.id.split('-')[1];
+        const savedTime = localStorage.getItem(`audio-progress-${bookId}`);
+        if (savedTime) {
+            audio.currentTime = parseFloat(savedTime);
+        }
+    }
+
+    function handlePlayButtonClick(playBtn) {
+        const bookId = playBtn.dataset.bookId;
+        const audio = document.getElementById(`audio-${bookId}`);
+        const playIcon = document.getElementById(`play-icon-${bookId}`);
+
+        if (activeAudioElement && activeAudioElement !== audio) {
+            activeAudioElement.pause();
+            const prevBookId = activeAudioElement.id.split('-')[1];
+            const prevPlayIcon = document.getElementById(`play-icon-${prevBookId}`);
+            if (prevPlayIcon) {
+                prevPlayIcon.textContent = 'play_arrow';
+            }
+        }
+
+        if (audio.paused) {
+            audio.play().catch(e => {
+                console.error("Audio play failed:", e);
+                alert("Could not play this audio file. The source may be invalid or unsupported.");
+            });
+            playIcon.textContent = 'pause';
+            activeAudioElement = audio;
+        } else {
+            audio.pause();
+            playIcon.textContent = 'play_arrow';
+            activeAudioElement = null;
+        }
+    }
+
+    function openAudioModal(bookCard) {
+        const bookId = bookCard.dataset.bookId;
+        const book = allAudiobooks.find(b => b._id === bookId);
+        const audio = document.getElementById(`audio-${bookId}`);
+        if (!book || !audio) return;
+
+        if (activeAudioElement && activeAudioElement !== audio) {
+            activeAudioElement.pause();
+            const prevBookId = activeAudioElement.id.split('-')[1];
+            const prevPlayIcon = document.getElementById(`play-icon-${prevBookId}`);
+            if (prevPlayIcon) prevPlayIcon.textContent = 'play_arrow';
+        }
+        
+        modalImage.src = book.coverUrl.startsWith('http') ? book.coverUrl : `${backendDomain}${book.coverUrl}`;
+        modalTitle.textContent = book.title;
+        modalAuthor.textContent = book.author;
+        
+        activeAudioElement = audio;
+        audio.play().catch(e => console.error("Audio play failed:", e));
+        modalPlayIcon.textContent = 'pause';
+        modalDuration.textContent = formatTime(audio.duration || 0);
+        
+        audioPlayerModal.style.display = 'flex';
+    }
+
+    // --- EVENT DELEGATION & INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchAllAudiobooks();
+
+        document.querySelector('.left-panel').addEventListener('click', (event) => {
+            const playBtn = event.target.closest('.play-btn');
+            const bookCard = event.target.closest('.book-card');
+            if (playBtn) {
+                event.stopPropagation();
+                handlePlayButtonClick(playBtn);
+            } else if (bookCard) {
+                openAudioModal(bookCard);
+            }
+        });
+
+        categoryFilters.addEventListener('click', (event) => {
+            if (event.target.tagName === 'BUTTON') {
+                categoryFilters.querySelector('.active').classList.remove('active');
+                event.target.classList.add('active');
+                const selectedCategory = event.target.dataset.category;
+                renderBooks('browse', browseContainer, null, false, selectedCategory);
+            }
+        });
+        
+        // Modal Controls
+        modalPlayPauseBtn.addEventListener('click', () => {
+            if (activeAudioElement) {
+                const bookId = activeAudioElement.id.split('-')[1];
+                const playIcon = document.getElementById(`play-icon-${bookId}`);
+                if (activeAudioElement.paused) {
+                    activeAudioElement.play();
+                    modalPlayIcon.textContent = 'pause';
+                    if (playIcon) playIcon.textContent = 'pause';
+                } else {
+                    activeAudioElement.pause();
+                    modalPlayIcon.textContent = 'play_arrow';
+                    if (playIcon) playIcon.textContent = 'play_arrow';
+                }
+            }
+        });
+        modalRewindBtn.addEventListener('click', () => { if (activeAudioElement) activeAudioElement.currentTime -= 10; });
+        modalForwardBtn.addEventListener('click', () => { if (activeAudioElement) activeAudioElement.currentTime += 10; });
+        closeModalBtn.addEventListener('click', () => {
+            if (activeAudioElement) activeAudioElement.pause();
+            audioPlayerModal.style.display = 'none';
+        });
+        window.addEventListener('click', (event) => {
+            if (event.target === audioPlayerModal) {
+                if (activeAudioElement) activeAudioElement.pause();
+                audioPlayerModal.style.display = 'none';
+            }
+        });
+    });
+</script>
+<script src="../Javascript/componentUpload.js">
+</script>
+</body>
+</html>

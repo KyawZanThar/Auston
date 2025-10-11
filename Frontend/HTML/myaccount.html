@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auston Book - Settings</title>
+    
+    <!-- 1. Link to the new, single, central stylesheet -->
+    <link rel="stylesheet" href="../CSS/myaccount.css">
+    <link rel="stylesheet" href="../CSS/sidebar.css">
+    <link rel="stylesheet" href="../CSS/topbar.css">
+</head>
+<body>
+     <div class="app">
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="content-area">
+                <div class="settings-container">
+                    <section class="settings-section">
+                        <h2>Manage Account</h2>
+                        <div class="settings-row">
+                            <div class="settings-label">Full Name</div>
+                            <!-- Add an ID to the input field -->
+                            <div class="settings-value"><input type="text" id="fullNameInput" value="" /></div>
+                        </div>
+                        <div class="settings-row">
+                            <div class="settings-label">Username</div>
+                            <!-- Add an ID to the input field -->
+                            <div class="settings-value"><input type="text" id="usernameInput" value="" /></div>
+                        </div>
+                        <div class="settings-row">
+                            <div class="settings-label">Profile Picture</div>
+                            <!-- Add an ID to the img tag -->
+                            <div class="settings-value"><img class="profile-pic-img" id="profilePicImg" src="https://placehold.co/48x48" alt="Profile Picture" /></div>
+                            <div><button class="btn">Upload</button></div>
+                        </div>
+                    </section>
+                    <!-- ... other sections ... -->
+                    <div class="save-section">
+                        <button class="save-btn">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="../config/appConfig.js"></script>
+    <script src="../Javascript/componentUpload.js">
+        // --- PASTE YOUR COMPLETE, WORKING COMPONENT-LOADING SCRIPT HERE ---
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get the user data that was saved during login
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (currentUser) {
+                // Find the elements in the form
+                const fullNameInput = document.getElementById('fullNameInput');
+                const usernameInput = document.getElementById('usernameInput');
+                const profilePicImg = document.getElementById('profilePicImg');
+
+                // Populate the form fields with the user's data
+                if (fullNameInput) {
+                    // Assuming 'username' from the token is the full name
+                    fullNameInput.value = currentUser.username || '';
+                }
+                if (usernameInput) {
+                    // Let's use the email prefix as a username for now
+                    usernameInput.value = currentUser.email ? currentUser.email.split('@')[0] : '';
+                }
+                if (profilePicImg) {
+                    if (currentUser.avatarUrl) {
+                        // If the user has a custom avatar, use it
+                        profilePicImg.src = `${backendDomain}${currentUser.avatarUrl}`;
+                    } else {
+                        // Otherwise, fall back to the dynamic Pravatar image
+                        profilePicImg.src = `https://i.pravatar.cc/150?u=${currentUser.id}`;
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

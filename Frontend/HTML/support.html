@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auston - Support</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts (Poppins) and Material Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+
+    <script>
+        // Customizing Tailwind CSS to match the design's color palette
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        'navy-dark': '#1E2A4D',
+                        'navy-light': '#2A3B69',
+                        'brand-blue': '#4A69FF',
+                        'brand-blue-light': 'rgba(74, 105, 255, 0.1)',
+                        'gray-bg': '#F7F8FA',
+                        'gray-text': '#8A94A6',
+                        'dark-text': '#333D4F',
+                        'sidebar-dark': '#14213d', // Added for sidebar consistency
+                        'sidebar-accent': '#fca311', // Added for sidebar consistency
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-bg font-poppins text-dark-text antialiased">
+
+    <div class="flex h-screen">
+        <!-- ===== Sidebar Start ===== -->
+        <aside class="fixed left-0 top-0 z-50 flex h-full w-64 flex-col bg-sidebar-dark text-white duration-300 ease-linear lg:static lg:translate-x-0">
+            <div class="flex items-center justify-start gap-2 px-6 py-5.5 lg:py-6.5">
+                <!-- Enhanced Logo -->
+                <a href="#" class="flex items-center">
+                    <svg width="130" height="32" viewBox="0 0 130 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <text x="0" y="24" font-family="Poppins, sans-serif" font-size="24" font-weight="bold"
+                            fill="#FDE047" style="text-shadow: 0px 1px 3px rgba(0,0,0,0.2);">AUSTON</text>
+                        <g style="filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.25));">
+                            <path d="M119.5 28L108.5 28L114 21.5L119.5 28Z" fill="#FDE047" />
+                            <path d="M110 20L110 9L122 20H110Z" fill="#FDE047" />
+                        </g>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="flex flex-col h-full justify-between px-4 pt-8">
+                <nav class="flex flex-col gap-4">
+                    <a href="dashboard.html" class="flex items-center gap-3 rounded-md px-4 py-3 text-gray-300 hover:bg-sidebar-accent hover:text-sidebar-dark transition-colors duration-300">
+                        <span class="material-icons-outlined">home</span>
+                        <span>Home</span>
+                    </a>
+                    <a href="category.html" class="flex items-center gap-3 rounded-md px-4 py-3 text-gray-300 hover:bg-sidebar-accent hover:text-sidebar-dark transition-colors duration-300">
+                        <span class="material-icons-outlined">grid_view</span>
+                        <span>Category</span>
+                    </a>
+                    <a href="myactivity.html" class="flex items-center gap-3 rounded-md px-4 py-3 text-gray-300 hover:bg-sidebar-accent hover:text-sidebar-dark transition-colors duration-300">
+                        <span class="material-icons-outlined">history</span>
+                        <span>My Activity</span>
+                    </a>
+                    <a href="audiobooks.html" class="flex items-center gap-3 rounded-md px-4 py-3 text-gray-300 hover:bg-sidebar-accent hover:text-sidebar-dark transition-colors duration-300">
+                        <span class="material-icons">headphones</span>
+                        <span>Audio Books</span>
+                    </a>
+                    <a href="mybooks.html" class="flex items-center gap-3 rounded-md px-4 py-3 text-gray-300 hover:bg-sidebar-accent hover:text-sidebar-dark transition-colors duration-300">
+                        <span class="material-icons">book</span>
+                        <span>My Books</span>
+                    </a>
+                </nav>
+
+                <nav class="flex flex-col gap-2 mb-6 border-t border-navy-light pt-6">
+                    <a href="setting.html" class="flex items-center gap-3 rounded-md px-4 py-2 text-gray-300 hover:bg-sidebar-accent hover:text-sidebar-dark transition-colors duration-300">
+                        <span class="material-icons-outlined">settings</span>
+                        <span>Setting</span>
+                    </a>
+                    <a href="support.html" class="flex items-center gap-3 rounded-md px-4 py-2 bg-brand-blue text-white font-medium">
+                        <span class="material-icons-outlined">support_agent</span>
+                        <span>Support</span>
+                    </a>
+                    <a href="SignUp.html" class="flex items-center gap-3 rounded-md px-4 py-2 text-gray-300 hover:bg-sidebar-accent hover:text-sidebar-dark transition-colors duration-300">
+                        <span class="material-icons-outlined">logout</span>
+                        <span>Logout</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        <!-- ===== Sidebar End ===== -->
+
+        <!-- ===== Main Content Start ===== -->
+        <div class="relative flex flex-1 flex-col h-screen overflow-y-auto">
+            <!-- ===== Header Start ===== -->
+            <header class="sticky top-0 z-40 flex w-full bg-navy-dark drop-shadow-sm">
+                <div class="flex flex-grow items-center justify-end py-4 px-4 shadow-sm md:px-6 2xl:px-11">
+                    <div class="flex items-center gap-4">
+                        <span class="text-white font-medium">Emily</span>
+                        <div class="relative">
+                            <a class="flex items-center gap-2" href="#">
+                                <img src="https://placehold.co/40x40/7C3AED/FFFFFF?text=E" alt="User"
+                                    class="h-10 w-10 rounded-full border-2 border-brand-blue">
+                                <span class="material-icons-outlined text-white">expand_more</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- ===== Header End ===== -->
+
+            <!-- Scrollable Content Area -->
+            <main class="flex-1 p-4 md:p-6 2xl:p-10">
+                <h1 class="text-3xl font-bold text-dark-text mb-8">Support</h1>
+
+                <!-- Contact Form Section -->
+                <section class="bg-white p-6 md:p-8 rounded-xl shadow-md mb-10">
+                    <h2 class="text-2xl font-semibold text-dark-text mb-6">Contact Us</h2>
+                    <p class="text-gray-text mb-6">If you have any questions or need assistance, please fill out the form below. We'll get back to you as soon as possible.</p>
+
+                    <form id="contact-form">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-dark-text mb-2">Full Name</label>
+                                <input type="text" id="name" name="name" required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-dark-text mb-2">Email Address</label>
+                                <input type="email" id="email" name="email" required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label for="subject" class="block text-sm font-medium text-dark-text mb-2">Subject</label>
+                            <input type="text" id="subject" name="subject" required
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                        </div>
+                        <div class="mb-6">
+                            <label for="message" class="block text-sm font-medium text-dark-text mb-2">Message</label>
+                            <textarea id="message" name="message" rows="5" required
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-blue"></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg hover:bg-brand-blue/90 transition-colors duration-200">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- FAQ Section -->
+                <section class="bg-white p-6 md:p-8 rounded-xl shadow-md mb-10">
+                    <h2 class="text-2xl font-semibold text-dark-text mb-6">Frequently Asked Questions</h2>
+                    <div class="space-y-4">
+                        <!-- FAQ Item 1 -->
+                        <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                            <h3 class="text-lg font-semibold text-dark-text cursor-pointer" onclick="toggleFAQ('faq1')">
+                                How do I change my password?
+                            </h3>
+                            <p id="faq1" class="text-gray-text mt-2 hidden">
+                                You can change your password by navigating to the "My Account" page in the sidebar and selecting "Change Password." Follow the on-screen instructions to update your password securely.
+                            </p>
+                        </div>
+                        <!-- FAQ Item 2 -->
+                        <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                            <h3 class="text-lg font-semibold text-dark-text cursor-pointer" onclick="toggleFAQ('faq2')">
+                                How can I access the digital library from home?
+                            </h3>
+                            <p id="faq2" class="text-gray-text mt-2 hidden">
+                                You can access the digital library by logging into your account with your school-provided credentials. Once logged in, you will have full access to all available audio books and resources.
+                            </p>
+                        </div>
+                        <!-- FAQ Item 3 -->
+                        <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                            <h3 class="text-lg font-semibold text-dark-text cursor-pointer" onclick="toggleFAQ('faq3')">
+                                How can I request a new audio book?
+                            </h3>
+                            <p id="faq3" class="text-gray-text mt-2 hidden">
+                                You can submit a request for a new audio book through the contact form on this page. Please provide the book's title and author, and we will do our best to add it to our library.
+                            </p>
+                        </div>
+                        <!-- FAQ Item 4 -->
+                        <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                            <h3 class="text-lg font-semibold text-dark-text cursor-pointer" onclick="toggleFAQ('faq4')">
+                                Can I download audio books for offline listening?
+                            </h3>
+                            <p id="faq4" class="text-gray-text mt-2 hidden">
+                                Yes, many of our audio books are available for download. After opening a book, you'll see a download option to save it to your device for offline use.
+                            </p>
+                        </div>
+                        <!-- FAQ Item 5 -->
+                        <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                            <h3 class="text-lg font-semibold text-dark-text cursor-pointer" onclick="toggleFAQ('faq5')">
+                                What should I do if a book is not loading or the audio is skipping?
+                            </h3>
+                            <p id="faq5" class="text-gray-text mt-2 hidden">
+                                First, please check your internet connection. If the issue persists, try clearing your browser's cache or using a different browser. If you still experience problems, please report the specific book and issue using our contact form.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Additional Contact Info Section -->
+                <section class="bg-white p-6 md:p-8 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-semibold text-dark-text mb-6">Other Ways to Contact Us</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex items-center gap-4">
+                            <span class="material-icons text-brand-blue text-4xl">email</span>
+                            <div>
+                                <h3 class="text-lg font-semibold text-dark-text">Email Support</h3>
+                                <p class="text-gray-text">support@auston.com</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="material-icons text-brand-blue text-4xl">phone</span>
+                            <div>
+                                <h3 class="text-lg font-semibold text-dark-text">Phone Support</h3>
+                                <p class="text-gray-text">+1 (555) 123-4567</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+        <!-- ===== Main Content End ===== -->
+    </div>
+
+    <script>
+        // Function to toggle FAQ content visibility
+        function toggleFAQ(id) {
+            const element = document.getElementById(id);
+            element.classList.toggle('hidden');
+        }
+
+        // Handle form submission (for demonstration purposes)
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            // This is a placeholder for a real form submission process.
+            // In a real application, you would send this data to a server.
+            console.log('Form submitted!');
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            console.log(data);
+            
+            // Show a simple success message
+            const successMessage = document.createElement('p');
+            successMessage.textContent = 'Thank you for your message! We will get back to you shortly.';
+            successMessage.className = 'text-green-500 mt-4 font-semibold text-center';
+            form.parentNode.insertBefore(successMessage, form.nextSibling);
+
+            // Reset the form
+            form.reset();
+            
+            // Hide the message after a few seconds
+            setTimeout(() => successMessage.remove(), 5000);
+        });
+    </script>
+</body>
+</html>

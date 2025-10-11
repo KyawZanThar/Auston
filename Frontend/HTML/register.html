@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create Account - Auston</title>
+  <style>
+    /* Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #14213D 0%, #FCA311 100%);
+      color: #14213D;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Container */
+    .container {
+      background: white;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 100%;
+      padding: 32px 32px 40px;
+      box-shadow: 0 8px 24px rgb(20 33 61 / 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Logo */
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: #ddd;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 700;
+      font-size: 18px;
+      color: #14213D;
+      user-select: none;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 14px;
+      color: #14213D;
+      margin-bottom: 24px;
+      user-select: none;
+    }
+
+    /* Heading */
+    h2 {
+      font-weight: 700;
+      font-size: 22px;
+      margin-bottom: 24px;
+      color: #14213D;
+    }
+
+    /* Form */
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Row for first and last name */
+    .row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .row input {
+      flex: 1;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: block;
+      color: #14213D;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+      outline-offset: 2px;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: white;
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px 16px;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #FCA311;
+      outline: none;
+      box-shadow: 0 0 6px #FCA311aa;
+    }
+
+    /* Custom down arrow for select */
+    select {
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%2314213D" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    }
+
+    /* Error styles */
+    input.error,
+    select.error {
+      border-color: #e63946;
+      background-color: #ffe6e6;
+    }
+
+    .error-message {
+      color: #e63946;
+      font-size: 12px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* Password toggle */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #14213D;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .toggle-password svg {
+      width: 20px;
+      height: 20px;
+      stroke: #14213D;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Submit button */
+    button[type="submit"] {
+      margin-top: 12px;
+      background: linear-gradient(90deg, #14213D 0%, #FCA311 100%);
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 4px 12px rgb(252 163 17 / 0.6);
+    }
+
+    button[type="submit"]:hover,
+    button[type="submit"]:focus {
+      background: linear-gradient(90deg, #FCA311 0%, #14213D 100%);
+      outline: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<div class="container">
+        <div class="logo">Auston</div>
+        <div class="logo-text">auston.ac.uk</div>
+        <h2>Create Account</h2>
+        
+        <!-- The novalidate attribute is important -->
+        <form id="registerForm" novalidate>
+            <div class="row">
+                <div>
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" placeholder="First name" required />
+                    <div class="error-message" id="firstNameError"></div>
+                </div>
+                <div>
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" placeholder="Last name" required />
+                    <div class="error-message" id="lastNameError"></div>
+                </div>
+            </div>
+            <div>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" required />
+                <div class="error-message" id="emailError"></div>
+            </div>
+            <div>
+                <label for="austonId">Auston ID</label>
+                <input type="text" id="austonId" name="austonId" placeholder="Enter your Auston ID" required />
+                <div class="error-message" id="austonIdError"></div>
+            </div>
+            <div>
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                    <option value="">Select Role</option>
+                    <option value="admin">Admin</option>
+                    <option value="student">Student</option>
+                    <option value="staff">Staff</option>
+                </select>
+                <div class="error-message" id="roleError"></div>
+            </div>
+            <div class="password-wrapper">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Create a password" required />
+                <button type="button" class="toggle-password">...</button>
+                <div class="error-message" id="passwordError"></div>
+            </div>
+            <div class="password-wrapper">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required />
+                <button type="button" class="toggle-password">...</button>
+                <div class="error-message" id="confirmPasswordError"></div>
+            </div>
+            
+            <!-- Profile Picture Upload -->
+            <div>
+                <label for="avatar">Profile Picture (Optional)</label>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <img id="avatar-preview" src="https://placehold.co/64x64/e5e7eb/9ca3af?text=Avatar" alt="Avatar Preview" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover;">
+                    <input type="file" id="avatar" name="avatar" accept="image/*">
+                </div>
+            </div>
+
+            <button type="submit">Create Account</button>
+        </form>
+    </div>
+
+  <script src="../config/appConfig.js"></script>
+  <script>
+    // Password toggle buttons
+    document.querySelectorAll('.toggle-password').forEach(button => {
+      button.addEventListener('click', () => {
+        const input = button.previousElementSibling;
+        if (input.type === 'password') {
+          input.type = 'text';
+          // Change icon to eye-off
+          button.innerHTML = `
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.4 21.4 0 0 1 5.11-6.32" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M1 1l22 22" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          `;
+        } else {
+          input.type = 'password';
+          // Change icon back to eye
+          button.innerHTML = `
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="12" cy="12" r="3" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          `;
+        }
+      });
+    });
+
+
+document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            
+            // --- AVATAR PREVIEW ---
+            const avatarInput = document.getElementById('avatar');
+            if (avatarInput) {
+                avatarInput.addEventListener('change', function(event) {
+                    const [file] = event.target.files;
+                    if (file) {
+                        document.getElementById('avatar-preview').src = URL.createObjectURL(file);
+                    }
+                });
+            }
+
+            // --- FORM SUBMISSION ---
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Prevent the default browser submission
+
+                // --- 1. VALIDATION ---
+                const isValid = validateForm();
+                if (!isValid) {
+                    console.log("Validation failed. Form submission stopped.");
+                    return; // Stop if validation fails
+                }
+                
+                console.log("Validation passed. Proceeding with form submission.");
+
+                // --- 2. FormData PREPARATION ---
+                const formData = new FormData(form);
+                // The 'name' attributes in your HTML (e.g., name="firstName") are used automatically.
+                // We just need to combine the names.
+                formData.set('username', `${formData.get('firstName')} ${formData.get('lastName')}`);
+                
+                // --- 3. FETCH LOGIC ---
+                try {
+                    const response = await fetch(`${backendDomain}/api/users/register`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const resData = await response.json();
+                    if (!response.ok) {
+                        throw new Error(resData.message || 'Registration failed.');
+                    }
+                    alert('Registration successful! Please log in.');
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('Registration Error:', error);
+                    alert(error.message);
+                }
+            });
+
+            // --- VALIDATION & HELPER FUNCTIONS ---
+            function validateForm() {
+                clearErrors();
+                let valid = true;
+                
+                const setError = (id, message) => {
+                    const input = document.getElementById(id);
+                    const errorDiv = document.getElementById(id + 'Error');
+                    if(input) input.classList.add('error');
+                    if(errorDiv) errorDiv.textContent = message;
+                    valid = false;
+                };
+
+                // Your validation checks are good, let's use them
+                if (!form.firstName.value.trim()) setError('firstName', 'First name is required');
+                if (!form.lastName.value.trim()) setError('lastName', 'Last name is required');
+                const email = form.email.value.trim();
+                if (!email) setError('email', 'Email is required');
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) setError('email', 'Invalid email format');
+                if (!form.austonId.value.trim()) setError('austonId', 'Auston ID is required');
+                if (!form.role.value) setError('role', 'Please select a role');
+                const password = form.password.value;
+                if (password.length < 6) setError('password', 'Password must be at least 6 characters');
+                if (password !== form.confirmPassword.value) setError('confirmPassword', 'Passwords do not match');
+
+                return valid;
+            }
+
+            function clearErrors() {
+                document.querySelectorAll('.error-message').forEach(div => div.textContent = '');
+                document.querySelectorAll('input.error, select.error').forEach(el => el.classList.remove('error'));
+            }
+        });
+  </script>
+</body>
+
+</html>

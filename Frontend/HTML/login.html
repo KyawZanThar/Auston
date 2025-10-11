@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign In - Auston</title>
+  <style>
+    /* Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #14213D 0%, #FCA311 100%);
+      color: #14213D;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Container */
+    .container {
+      background: white;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 100%;
+      padding: 32px 32px 40px;
+      box-shadow: 0 8px 24px rgb(20 33 61 / 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Logo */
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: #ddd;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 700;
+      font-size: 18px;
+      color: #14213D;
+      user-select: none;
+    }
+
+    .logo-text {
+      font-weight: 400;
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 24px;
+      user-select: none;
+    }
+
+    /* Heading */
+    h2 {
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 24px;
+      color: #14213D;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      user-select: none;
+      border: 1.5px solid #ccc;
+      width: fit-content;
+      background: #f7f7f7;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px 24px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      background: #f7f7f7;
+      color: #666;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      border-right: 1.5px solid #ccc;
+      border-radius: 0;
+      user-select: none;
+    }
+
+    .tab:last-child {
+      border-right: none;
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    .tab.active {
+      background: white;
+      color: #1a73e8;
+      font-weight: 700;
+      border: 1.5px solid #ccc;
+      border-bottom: none;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: 6px;
+      box-shadow: 0 2px 6px rgb(26 115 232 / 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Form */
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: block;
+      color: #14213D;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+      outline-offset: 2px;
+    }
+
+    input:focus {
+      border-color: #FCA311;
+      outline: none;
+      box-shadow: 0 0 6px #FCA311aa;
+    }
+
+    /* Password toggle */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #14213D;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .toggle-password svg {
+      width: 20px;
+      height: 20px;
+      stroke: #14213D;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Checkbox and forgot password container */
+    .options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      margin-bottom: 24px;
+      color: #14213D;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .options label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 120px;
+    }
+
+    .options a {
+      color: #1a73e8;
+      text-decoration: none;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .options a:hover,
+    .options a:focus {
+      text-decoration: underline;
+      outline: none;
+    }
+
+    /* Submit button */
+    button[type="submit"] {
+      background: linear-gradient(90deg, #14213D 0%, #FCA311 100%);
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 4px 12px rgb(252 163 17 / 0.6);
+      width: 100%;
+    }
+
+    button[type="submit"]:hover,
+    button[type="submit"]:focus {
+      background: linear-gradient(90deg, #FCA311 0%, #14213D 100%);
+      outline: none;
+    }
+
+    /* Footer links */
+    .footer-links {
+      margin-top: 24px;
+      font-size: 14px;
+      color: #14213D;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .footer-links a {
+      color: #1a73e8;
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .footer-links a:hover,
+    .footer-links a:focus {
+      text-decoration: underline;
+      outline: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .container {
+        padding: 24px 20px 32px;
+      }
+
+      .options {
+        justify-content: flex-start;
+        gap: 12px;
+      }
+
+      .options label {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container" role="main" aria-label="Sign In Form">
+    <div class="logo" aria-hidden="true">Auston</div>
+    <div class="logo-text">auston.ac.uk</div>
+    <h2>Enter password</h2>
+
+    <div class="tabs" role="tablist" aria-label="Sign in method">
+      <button class="tab active" role="tab" aria-selected="true" aria-controls="austonIdPanel" id="austonIdTab"
+        tabindex="0">Auston ID</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="emailPanel" id="emailTab"
+        tabindex="-1">Email</button>
+    </div>
+
+    <form id="signInForm" novalidate>
+      <div id="austonIdPanel" role="tabpanel" aria-labelledby="austonIdTab">
+        <label for="austonIdInput">Auston ID</label>
+        <input type="text" id="austonIdInput" name="austonId" placeholder="Enter your Auston ID" required
+          aria-required="true" />
+        <div class="error-message" id="austonIdError"></div>
+      </div>
+
+      <div id="emailPanel" role="tabpanel" aria-labelledby="emailTab" hidden>
+        <label for="emailInput">Email</label>
+        <input type="email" id="emailInput" name="email" placeholder="Enter your email address" required
+          aria-required="true" />
+        <div class="error-message" id="emailError"></div>
+      </div>
+
+      <div class="password-wrapper">
+        <label for="passwordInput">Password</label>
+        <input type="password" id="passwordInput" name="password" placeholder="Password" required
+          aria-required="true" />
+        <button type="button" class="toggle-password" aria-label="Toggle password visibility" tabindex="-1">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#14213D" stroke-width="2" fill="none"
+              stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="12" cy="12" r="3" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="error-message" id="passwordError"></div>
+      </div>
+
+      <div class="options">
+        <label for="rememberMe">
+          <input type="checkbox" id="rememberMe" name="rememberMe" />
+          Remember me
+        </label>
+        <a href="#" tabindex="0">Forgotten my password</a>
+      </div>
+
+      <button type="submit" aria-label="Sign In">Sign In</button>
+    </form>
+
+    <div class="footer-links">
+      Don't have an account? <a href="../HTML/register.html">Sign up</a><br />
+      Need help? Contact <a href="#">Library Support</a>
+    </div>
+  </div>
+
+  <script src="../config/appConfig.js"></script>
+  <script>
+    // Tab switching
+    const austonIdTab = document.getElementById('austonIdTab');
+    const emailTab = document.getElementById('emailTab');
+    const austonIdPanel = document.getElementById('austonIdPanel');
+    const emailPanel = document.getElementById('emailPanel');
+
+    austonIdTab.addEventListener('click', () => {
+      austonIdTab.classList.add('active');
+      austonIdTab.setAttribute('aria-selected', 'true');
+      austonIdTab.tabIndex = 0;
+
+      emailTab.classList.remove('active');
+      emailTab.setAttribute('aria-selected', 'false');
+      emailTab.tabIndex = -1;
+
+      austonIdPanel.hidden = false;
+      emailPanel.hidden = true;
+    });
+
+    emailTab.addEventListener('click', () => {
+      emailTab.classList.add('active');
+      emailTab.setAttribute('aria-selected', 'true');
+      emailTab.tabIndex = 0;
+
+      austonIdTab.classList.remove('active');
+      austonIdTab.setAttribute('aria-selected', 'false');
+      austonIdTab.tabIndex = -1;
+
+      emailPanel.hidden = false;
+      austonIdPanel.hidden = true;
+    });
+
+    // Password toggle
+    document.querySelector('.toggle-password').addEventListener('click', function () {
+      const input = document.getElementById('passwordInput');
+      if (input.type === 'password') {
+        input.type = 'text';
+        this.innerHTML = `
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.4 21.4 0 0 1 5.11-6.32" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 1l22 22" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+      } else {
+        input.type = 'password';
+        this.innerHTML = `
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="3" stroke="#14213D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+      }
+    });
+
+    // Form validation and submission
+    const form = document.getElementById('signInForm');
+
+// In: login.html (inside the <script> at the bottom)
+
+// Replace your existing form submit listener with this one
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    clearErrors();
+    let valid = true;
+
+    let loginData = {};
+    if (!austonIdPanel.hidden) {
+        const austonIdInput = document.getElementById('austonIdInput');
+        if (!austonIdInput.value.trim()) {
+            setError('austonIdInput', 'Auston ID is required');
+            valid = false;
+        } else {
+            loginData.austonId = austonIdInput.value.trim();
+        }
+    } else {
+        const emailInput = document.getElementById('emailInput');
+        if (!emailInput.value.trim()) {
+            setError('emailInput', 'Email is required');
+            valid = false;
+        } else {
+            loginData.email = emailInput.value.trim();
+        }
+    }
+
+    const passwordInput = document.getElementById('passwordInput');
+    if (!passwordInput.value.trim()) {
+        setError('passwordInput', 'Password is required');
+        valid = false;
+    } else {
+        loginData.password = passwordInput.value;
+    }
+
+    if (valid) {
+        fetch(backendDomain + '/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(loginData)
+        })
+        .then(async (response) => {
+            const resData = await response.json();
+            if (response.ok) {
+    // --- THIS IS THE CRITICAL FIX ---
+
+    // 1. Save the token
+    localStorage.setItem('mock_token', resData.token);
+
+    // 2. The backend now sends the user object directly. Save it.
+    // No need to decode the token on the frontend anymore.
+    localStorage.setItem('currentUser', JSON.stringify(resData.user));
+
+    // 3. Redirect to the correct page based on the user's role
+    if (resData.user.role === 'admin') {
+        window.location.href = '/HTML/Admin.html';
+    } else {
+        window.location.href = '/HTML/dashboard.html';
+    }
+                
+            } else {
+                alert(resData.message || 'Login failed.');
+            }
+        })
+        .catch(() => {
+            alert('Could not connect to server.');
+        });
+    }
+});
+
+    function setError(id, message) {
+      const input = document.getElementById(id);
+      const errorDiv = input.nextElementSibling;
+      input.classList.add('error');
+      if (errorDiv && errorDiv.classList.contains('error-message')) {
+        errorDiv.textContent = message;
+      }
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.error-message').forEach(div => div.textContent = '');
+      document.querySelectorAll('input').forEach(input => input.classList.remove('error'));
+    }
+
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email.toLowerCase());
+    }
+  </script>
+</body>
+
+</html>

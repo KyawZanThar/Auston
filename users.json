@@ -1,0 +1,27 @@
+[
+  {
+    "username": "Hlaing Hay Mann Thin",
+    "email": "kimvennila2004@gmail.com",
+    "password": "$2a$10$wTN.A4IB/Z7chzSP9dz9MerHrM94eFmC0Iz/u8S1XDMLGXhM7.jB2",
+    "austonId": "Auee3323"
+  },
+  {
+    "username": "hay mann",
+    "email": "haymann.261203@gmail.com",
+    "password": "$2a$10$2ajPUiKfc6qYZgRTgAPewuPT2iKfK2ajZPtCc5lDsf60PA9Q4ihMq",
+    "austonId": "AU2301035"
+  },
+  {
+    "username": "Hay Mann",
+    "email": "hlainghaymamthin@st.auston.edu.mm",
+    "password": "$2a$10$yg6xrXvE5tVh1sokk7nsOeBZddmoIPO/epyDFWcV86q4AiQa5bjni",
+    "austonId": "AU239293"
+  },
+  {
+    "username": "Test Admin",
+    "email": "admin@auston.edu.mm",
+    "austonId": "AUADMIN",
+    "role": "admin",
+    "password": "$2a$10$2vlzg2m1T6FkRZW2FvD.veCFDntcxwGWusSurJf3McpMGGflvpdqi"
+  }
+]

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome to Auston College Library</title>
+  <style>
+    /* Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #14213D;
+      color: white;
+      overflow: hidden;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      height: 100vh;
+    }
+
+    /* Background image as img element */
+    .bg-image {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      opacity: 0.4;
+      z-index: -2;
+      pointer-events: none;
+      user-select: none;
+    }
+    /* Dark overlay */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #14213D;
+      opacity: 0.6;
+      z-index: -1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Container for content */
+    .container {
+      max-width: 600px;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Logo */
+    .logo {
+      font-weight: 700;
+      font-size: 28px;
+      color: #FCA311;
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo svg {
+      width: 32px;
+      height: 32px;
+      fill: #FCA311;
+    }
+
+    /* Heading */
+    h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+    }
+    h1 span {
+      display: block;
+    }
+
+    /* Quote */
+    .quote {
+      font-size: 1.1rem;
+      font-weight: 400;
+      font-style: italic;
+      margin-bottom: 40px;
+      color: #FCA311;
+    }
+
+    /* Get Started Button */
+    .btn-get-started {
+      background-color: #FCA311;
+      color: #14213D;
+      font-weight: 700;
+      font-size: 1.2rem;
+      padding: 14px 40px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 12px rgba(252, 163, 17, 0.6);
+    }
+    .btn-get-started:hover,
+    .btn-get-started:focus {
+      background-color: #e6a00f;
+      outline: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+      .btn-get-started {
+        width: 100%;
+        padding: 14px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background image -->
+  <img class="bg-image" src="https://lh3.googleusercontent.com/p/AF1QipOsJVXf-If6QoWd9U67ToDk5kmv8EO5Com4DBMz=s1360-w1360-h1020-rw" alt="Auston College Library building" />
+  <div class="overlay"></div>
+
+  <div class="container" role="main" aria-label="Welcome to Auston College Library">
+    <div class="logo" aria-hidden="true">
+      AUSTON
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M3 21L21 12 3 3v18z" />
+      </svg>
+    </div>
+    <h1>
+      <span>WELCOME</span>
+      <span>TO</span>
+      <span>AUSTON COLLEGE LIBRARY</span>
+    </h1>
+    <p class="quote" aria-label="Inspirational quote">
+      “Nothing is more pleasurable than exploring a library”
+    </p>
+    <button class="btn-get-started" id="getStartedBtn" aria-label="Get started and register">
+      GET STARTED
+    </button>
+  </div>
+
+  <script>
+    document.getElementById('getStartedBtn').addEventListener('click', () => {
+      window.location.href = 'register.html';
+    });
+  </script>
+</body>
+</html>

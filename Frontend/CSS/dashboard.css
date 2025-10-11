@@ -1,0 +1,34 @@
+/* In: Frontend/css/main.css */
+
+/* --- Reset & Base Styles --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f8f9fb; color: #1a1a1a; }
+html, body { height: 100%; overflow: hidden; }
+
+/* --- Main App Layout --- */
+.app {
+    display: flex; /* This is good practice for structure */
+    height: 100vh;
+    position: relative; /* Establishes a positioning context */
+}
+
+/* --- Main Content Area (the right side) --- */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    
+    /* --- THIS IS THE CRITICAL FIX --- */
+    /* This pushes the main content to the right to make space for the fixed sidebar. */
+    /* This value MUST match the width of your sidebar. */
+    margin-left: 220px; 
+}
+
+/* --- The scrollable area for page content --- */
+.content-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 24px;
+}

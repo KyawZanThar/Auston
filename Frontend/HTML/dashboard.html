@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auston Book Dashboard</title>
+  
+  <!-- Link to your new central stylesheet -->
+
+  <link rel="stylesheet" href="../CSS/dashboard.css">
+   <link rel="stylesheet" href="../CSS/topbar.css">
+  
+  
+  <!-- Page-specific styles for the dashboard content -->
+  <style>
+    .content-area { display: flex; flex-grow: 1; overflow: hidden; padding: 24px; gap: 32px; }
+    .left-panel { flex: 2.5; display: flex; flex-direction: column; gap: 40px; overflow-y: auto; padding-right: 8px; }
+    .right-panel { flex: 1.8; background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.05); display: flex; flex-direction: column; align-items: center; overflow-y: auto; min-width: 280px; max-width: 360px; }
+    .recommended, .categories { background: #fff; border-radius: 12px; padding: 24px 28px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.05); }
+    .recommended h2, .categories h2 { margin: 0 0 20px 0; font-weight: 700; font-size: 22px; color: #1a1a1a; }
+    .recommended-list, .category-books { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 6px; }
+    .book-card, .category-book-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.05); min-width: 160px; cursor: pointer; padding: 16px; display: flex; flex-direction: column; align-items: center; transition: box-shadow 0.3s ease; border: 3px solid transparent; }
+    .book-card.highlighted, .category-book-card.highlighted { border-color: #fca311; background: #fff9e6; }
+    .book-card img, .category-book-card img { width: 110px; height: 150px; object-fit: cover; border-radius: 6px; margin-bottom: 14px; box-shadow: 0 4px 8px rgb(0 0 0 / 0.1); }
+    .book-card .title, .category-book-card .title { font-weight: 700; font-size: 16px; text-align: center; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+    .book-card .author, .category-book-card .author { font-weight: 400; font-size: 14px; color: #555; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+    .category-filters { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .category-filters button { padding: 8px 18px; border-radius: 20px; border: 1.5px solid #14213d; font-weight: 600; font-size: 15px; color: #14213d; background: white; transition: all 0.3s ease; }
+    .category-filters button.active, .category-filters button:hover { background: #14213d; color: white; }
+    .right-panel img { width: 160px; height: 220px; object-fit: cover; border-radius: 12px; box-shadow: 0 6px 12px rgb(0 0 0 / 0.15); margin-bottom: 16px; }
+    .right-panel h3 { font-weight: 700; font-size: 20px; margin: 0 0 6px 0; text-align: center; }
+    .right-panel .author { font-weight: 600; font-size: 14px; color: #555; margin-bottom: 16px; text-align: center; }
+    .right-panel .rating { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; }
+    .right-panel .rating svg { width: 20px; height: 20px; fill: #fca311; }
+    .right-panel .stats { display: flex; justify-content: space-around; width: 100%; margin-bottom: 20px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 12px 0; }
+    .right-panel .stats .number { font-weight: 700; font-size: 18px; color: #14213d; margin-bottom: 4px; }
+    .right-panel .description { font-size: 14px; color: #555; line-height: 1.5; text-align: center; margin-bottom: 24px; }
+    .right-panel button.read-now { background-color: #14213d; color: white; padding: 12px 32px; border-radius: 8px; font-weight: 700; font-size: 16px; transition: background-color 0.3s ease; width: 100%; max-width: 200px; }
+    .right-panel button.read-now:hover { background-color: #fca311; color: #14213d; }
+  </style>
+</head>
+<body>
+  <!-- THIS IS THE CORRECTED HTML STRUCTURE -->
+  <div class="app">
+    
+    <!-- Sidebar Placeholder -->
+    <div id="sidebar-placeholder"></div>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+      
+      <!-- Top Bar Placeholder -->
+      <div id="topbar-placeholder"></div>
+
+      <!-- Scrollable Content Area -->
+      <div class="content-area">
+        <section class="left-panel">
+          <section class="recommended">
+            <h2>Recommended</h2>
+            <div class="recommended-list" id="recommended-list"></div>
+          </section>
+          <section class="categories">
+            <h2>Categories</h2>
+            <div class="category-filters" id="category-filters"></div>
+            <div class="category-books" id="category-books"></div>
+            <div class="flex justify-center mt-8">
+                <button id="load-more-btn" style="display: none; padding: 10px 20px; background-color: #14213d; color: white; border-radius: 8px; font-weight: 600;">Load More Books</button>
+            </div>
+          </section>
+        </section>
+        <section class="right-panel" id="book-details"></section>
+      </div>
+    </div>
+  </div>
+ <!-- In: dashboard.html (at the bottom of the <body> tag) -->
+
+<!-- 1. Include your config file -->
+<script src="/config/appConfig.js"></script>
+
+<!-- 2. The main, dynamic script -->
+<script>
+     // --- CONFIGURATION & DOM ELEMENTS ---
+   const API_BASE_URL = `${backendDomain}/api/books`;
+    const token = localStorage.getItem('mock_token');
+
+    const recommendedList = document.getElementById("recommended-list");
+    const categoryFilters = document.getElementById("category-filters");
+    const categoryBooksContainer = document.getElementById("category-books");
+    const bookDetailsPanel = document.getElementById("book-details");
+    const profileNameSpan = document.getElementById("profileName");
+    const loadMoreBtn = document.getElementById("load-more-btn");
+
+    // --- STATE ---
+    let allBooks = [];
+    let selectedBookId = null;
+    let selectedCategory = "All";
+    let currentPage = 1;
+    let isLoadingMore = false;
+    const categories = ["All", "General", "Business", "IT & CS", "Research"];
+
+    // --- HELPER FUNCTIONS ---
+    function sanitizeHTML(str) {
+        if (!str) return '';
+        const temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML;
+    }
+
+    function createStarRating(rating) {
+        const stars = [];
+        for (let i = 0; i < 5; i++) {
+            stars.push(`<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" ${i < Math.round(rating) ? 'fill="#fca311"' : 'fill="#ddd"'}><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`);
+        }
+        return stars.join("");
+    }
+
+    // --- DATA FETCHING (CORRECTED VERSION) ---
+    async function fetchContent(page = 1, category = "All") {
+        if (!token) {
+            alert("You are not logged in.");
+            window.location.href = 'login.html';
+            return;
+        }
+        isLoadingMore = true;
+        if (loadMoreBtn) loadMoreBtn.innerText = "Loading...";
+
+        try {
+            const privateBooksPromise = (page === 1 && (category === "All" || category === "General"))
+                ? fetch(`${API_BASE_URL}?category=${category}`, { headers: { 'Authorization': `Bearer ${token}` } })
+                : Promise.resolve(null);
+
+            // Using the correct '/tech-books' endpoint
+            const techBooksPromise = fetch(`${API_BASE_URL}/tech-books?page=${page}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            const [privateResponse, techResponse] = await Promise.all([
+                privateBooksPromise,
+                techBooksPromise
+            ]);
+
+            // --- THIS IS THE CRITICAL FIX ---
+            // Use the correct variable names: 'privateResponse' and 'techResponse'
+            const privateBooks = privateResponse && privateResponse.ok ? await privateResponse.json() : [];
+            const techBooks = techResponse && techResponse.ok ? await techResponse.json() : [];
+
+            // Now, newBooks is guaranteed to be a clean array
+            const newBooks = [...privateBooks, ...techBooks].filter(book => book && book._id);
+
+            if (page === 1) {
+                allBooks = newBooks;
+                if (category === "All") allBooks.sort(() => Math.random() - 0.5);
+            } else {
+                allBooks.push(...newBooks);
+            }
+            
+            if (loadMoreBtn) {
+                loadMoreBtn.style.display = newBooks.length < 20 ? 'none' : 'block';
+            }
+
+            if (page === 1) {
+                if (allBooks.length > 0) {
+                    selectedBookId = allBooks[0]._id;
+                    renderAllComponents();
+                } else {
+                    recommendedList.innerHTML = '';
+                    categoryBooksContainer.innerHTML = '<p class="text-gray-500">No books found for this category.</p>';
+                    bookDetailsPanel.innerHTML = '';
+                }
+            } else {
+                renderNewCategoryBooks(newBooks);
+            }
+
+        } catch (error) {
+            console.error("Fetch error:", error);
+            categoryBooksContainer.innerHTML = `<p class="text-red-500">Error loading books. Please try again.</p>`;
+        } finally {
+            isLoadingMore = false;
+            if (loadMoreBtn) loadMoreBtn.innerText = "Load More Books";
+        }
+    }
+
+    // --- UI RENDERING ---
+    function renderAllComponents() {
+        renderRecommendedBooks();
+        renderCategoryBooks();
+        const selectedBook = allBooks.find(b => b._id === selectedBookId);
+        renderBookDetails(selectedBook);
+    }
+
+    function renderBookCard(book, containerClass) {
+        if (!book || !book._id) return document.createDocumentFragment();
+        const card = document.createElement("div");
+        card.className = containerClass + (book._id === selectedBookId ? " highlighted" : "");
+        card.setAttribute("tabindex", "0");
+        card.dataset.bookId = book._id;
+        card.innerHTML = `
+            <img src="${sanitizeHTML(book.coverUrl || 'https://placehold.co/110x150/14213d/fca311?text=No+Image')}" alt="${sanitizeHTML(book.title)} cover" />
+            <div class="title" title="${sanitizeHTML(book.title)}">${sanitizeHTML(book.title)}</div>
+            <div class="author" title="${sanitizeHTML(book.author)}">${sanitizeHTML(book.author)}</div>
+        `;
+        card.addEventListener("click", () => {
+            selectedBookId = book._id;
+            const selectedBook = allBooks.find(b => b._id === selectedBookId);
+            renderBookDetails(selectedBook);
+            document.querySelectorAll('.book-card, .category-book-card').forEach(c => {
+                c.classList.toggle('highlighted', c.dataset.bookId === selectedBookId);
+            });
+        });
+        return card;
+    }
+
+    function renderRecommendedBooks() {
+        recommendedList.innerHTML = "";
+        const recommended = allBooks.slice(0, 8);
+        recommended.forEach(book => {
+            if (book) recommendedList.appendChild(renderBookCard(book, "book-card"));
+        });
+    }
+
+    function renderCategoryFilters() {
+        categoryFilters.innerHTML = "";
+        categories.forEach(cat => {
+            const btn = document.createElement("button");
+            btn.textContent = cat;
+            btn.className = cat === selectedCategory ? "active" : "";
+            btn.addEventListener("click", () => {
+                selectedCategory = cat;
+                currentPage = 1;
+                renderCategoryFilters();
+                fetchContent(currentPage, selectedCategory);
+            });
+            categoryFilters.appendChild(btn);
+        });
+    }
+
+    function renderCategoryBooks() {
+        if (currentPage === 1) categoryBooksContainer.innerHTML = "";
+        const filteredBooks = selectedCategory === "All" ? allBooks : allBooks.filter(book => book && book.category && book.category.toLowerCase().includes(selectedCategory.toLowerCase()));
+        if (filteredBooks.length === 0 && currentPage === 1) {
+            categoryBooksContainer.innerHTML = '<p class="text-gray-500">No books found in this category.</p>';
+            return;
+        }
+        filteredBooks.forEach(book => {
+            if (book) categoryBooksContainer.appendChild(renderBookCard(book, "category-book-card"));
+        });
+    }
+    
+    function renderNewCategoryBooks(newBooks) {
+        newBooks.forEach(book => {
+            if (book) categoryBooksContainer.appendChild(renderBookCard(book, "category-book-card"));
+        });
+    }
+
+    function renderBookDetails(book) {
+        if (!book) {
+            bookDetailsPanel.innerHTML = `<p class="text-center text-gray-500">Select a book to see details.</p>`;
+            return;
+        }
+        bookDetailsPanel.innerHTML = `
+            <img src="${sanitizeHTML(book.coverUrl || 'https://placehold.co/160x220/14213d/fca311?text=No+Image')}" alt="${sanitizeHTML(book.title)} cover" />
+            <h3>${sanitizeHTML(book.title)}</h3>
+            <div class="author">${sanitizeHTML(book.author)}</div>
+            <div class="rating">${createStarRating(book.ratings || 4)}<span class="rating-value">${book.ratings || 4}</span></div>
+            <div class="stats">
+                <div><div class="number">${book.pages || 'N/A'}</div>Pages</div>
+                <div><div class="number">${book.ratings || 0}</div>Ratings</div>
+                <div><div class="number">${book.reviews || 0}</div>Reviews</div>
+            </div>
+            <div class="description">${sanitizeHTML(book.description)}</div>
+            <button class="read-now">Read Now</button>
+        `;
+        const readNowBtn = bookDetailsPanel.querySelector('.read-now');
+        readNowBtn.addEventListener('click', () => {
+            localStorage.setItem('selectedBook', JSON.stringify(book));
+            window.location.href = `readbook.html`;
+        });
+    }
+    
+    function updateUserProfileDisplay() {
+        try {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser && currentUser.username) {
+                profileNameSpan.textContent = currentUser.username;
+            }
+        } catch (e) { console.error("Could not update user profile name.", e); }
+    }
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        updateUserProfileDisplay();
+        renderCategoryFilters();
+        fetchContent(1, "All");
+
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => {
+                if (!isLoadingMore) {
+                    currentPage++;
+                    fetchContent(currentPage, selectedCategory);
+                }
+            });
+        }
+    });
+</script>
+<!-- At the end of the <body> of every page -->
+
+<!-- In every HTML file, at the end of the <body> -->
+
+<!-- At the end of the <body> of every page -->
+<script src="../Javascript/componentUpload.js"></script>
+
+</body>
+</html>

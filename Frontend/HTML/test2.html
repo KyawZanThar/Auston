@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readly - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../CSS/sidebar.css">
+    <link rel="sthylesheet" href="../CSS/topbar.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling on the body itself */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .app {
+            display: flex;
+            height: 100vh; /* Ensure app takes full viewport height */
+        }
+
+        .main-content {
+            flex: 1;
+            background: #f7f8fc;
+            overflow-y: auto; /* This is the main scrollable area */
+            margin-left: 240px; /* Offset for the fixed sidebar */
+        }
+        .dashboard { padding: 24px; }
+        .dashboard-header { margin-bottom: 24px; }
+        .dashboard-title { font-size: 24px; font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+        .reading-status { display: flex; align-items: center; gap: 24px; font-size: 14px; color: #6b7280; flex-wrap: wrap; }
+        .reading-status strong { color: #374151; font-weight: 500; }
+        .dashboard-content { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+        .left-column, .right-column { display: flex; flex-direction: column; gap: 24px; }
+        .section-card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); border: 1px solid #e1e5e9; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .section-title { font-size: 18px; font-weight: 600; color: #1f2937; }
+        .see-more { color: #6b7280; font-size: 13px; text-decoration: none; font-weight: 500; }
+        .goals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .goal-item { text-align: center; }
+        .goal-chart { width: 100px; height: 100px; margin: 0 auto 12px; position: relative; }
+        .goal-percentage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 700; color: #1f2937; }
+        .goal-title { font-size: 13px; color: #6b7280; font-weight: 500; }
+        .progress-ring__circle { transition: stroke-dashoffset 1s ease-out; transform: rotate(-90deg); transform-origin: 50% 50%; }
+        .carousel-container { position: relative; }
+        .books-carousel { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 8px; scroll-behavior: smooth; }
+        .books-carousel::-webkit-scrollbar { display: none; }
+        .book-item { flex-shrink: 0; width: 120px; cursor: pointer; }
+        .book-cover { width: 120px; height: 170px; border-radius: 8px; margin-bottom: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }
+        .book-item:hover .book-cover { transform: translateY(-4px); }
+        .book-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .book-title { font-size: 13px; font-weight: 600; color: #1f2937; line-height: 1.3; margin-bottom: 2px; }
+        .book-author { font-size: 12px; color: #6b7280; }
+        .carousel-arrow { position: absolute; top: 40%; transform: translateY(-50%); background: #fff; border: 1px solid #d1d5db; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+        .carousel-arrow.right { right: -16px; }
+        .activity-list { display: flex; flex-direction: column; gap: 16px; }
+        .activity-item { display: flex; gap: 12px; align-items: flex-start; }
+        .activity-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; }
+        .activity-content { flex: 1; }
+        .activity-text { font-size: 14px; color: #1f2937; margin-bottom: 4px; }
+        .activity-time { font-size: 12px; color: #9ca3af; }
+        .chart-controls { display: flex; gap: 8px; margin-bottom: 16px; }
+        .chart-tab { padding: 6px 12px; border: 1px solid #e1e5e9; background: #fff; color: #6b7280; border-radius: 6px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .chart-tab.active { background: #1f2937; color: white; border-color: #1f2937; }
+        .chart-container { height: 180px; position: relative; }
+        .genre-chart-container { display: flex; flex-direction: column; }
+        .genre-chart { width: 150px; height: 150px; flex-shrink: 0; margin-bottom: 16px; }
+        .genre-legend { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .legend-color { width: 10px; height: 10px; border-radius: 2px; }
+        .legend-percentage { margin-left: auto; font-weight: 600; color: #374151; }
+        @media (min-width: 768px) { .genre-chart-container { flex-direction: row; align-items: center; gap: 24px; } .genre-chart { margin-bottom: 0; } .genre-legend { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1200px) { .genre-legend { grid-template-columns: 1fr; } }
+        .authors-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .author-tag { background: #f3f4f6; padding: 6px 12px; border-radius: 20px; font-size: 13px; color: #374151; cursor: pointer; transition: all 0.2s; }
+        .author-tag:hover { background: #e5e7eb; }
+        @media (max-width: 1200px) { .dashboard-content { grid-template-columns: 1fr; } .carousel-arrow.right { right: 0; } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } .goals-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+       <div id = "sidebar-placeholder"></div>>
+
+        <!-- Main Content -->
+        <main class="main-content">
+          <div id="topbar-placeholder"></div>
+
+            <div class="dashboard">
+                <div class="dashboard-header"><h1 class="dashboard-title">Dashboard</h1><div class="reading-status"><p>Now reading: <strong>Dandelion Wine, Ray Bradbury</strong></p><p>Reader status: <strong>Master</strong></p><p>Readers top: <strong>127 place</strong></p></div></div>
+                <div class="dashboard-content">
+                    <div class="left-column">
+                        <div class="section-card">
+                            <div class="section-header"><h2 class="section-title">Your goals</h2><a href="#" class="see-more">See more</a></div>
+                            <div class="goals-grid">
+                                <div class="goal-item" data-percent="72" data-color="#4A6CFD"><div class="goal-chart"><svg class="progress-ring" width="100" height="100"><circle class="progress-ring__circle-bg" cx="50" cy="50" r="45" fill="none" stroke="#f3f4f6" stroke-width="10"/><circle class="progress-ring__circle" cx="50" cy="50" r="45" fill="none" stroke="#4A6CFD" stroke-width="10"/></svg><div class="goal-percentage">72%</div></div><div class="goal-title">Read 40 books a year</div></div>
+                                <div class="goal-item" data-percent="48" data-color="#A3BFFA"><div class="goal-chart"><svg class="progress-ring" width="100" height="100"><circle class="progress-ring__circle-bg" cx="50" cy="50" r="45" fill="none" stroke="#f3f4f6" stroke-width="10"/><circle class="progress-ring__circle" cx="50" cy="50" r="45" fill="none" stroke="#A3BFFA" stroke-width="10"/></svg><div class="goal-percentage">48%</div></div><div class="goal-title">Read 10 business books</div></div>
+                                <div class="goal-item" data-percent="80" data-color="#2D3748"><div class="goal-chart"><svg class="progress-ring" width="100" height="100"><circle class="progress-ring__circle-bg" cx="50" cy="50" r="45" fill="none" stroke="#f3f4f6" stroke-width="10"/><circle class="progress-ring__circle" cx="50" cy="50" r="45" fill="none" stroke="#2D3748" stroke-width="10"/></svg><div class="goal-percentage">80%</div></div><div class="goal-title">Read 15 biographies</div></div>
+                            </div>
+                        </div>
+                        <div class="section-card">
+                            <div class="section-header"><h2 class="section-title">Social activity</h2><a href="#" class="see-more">See more</a></div>
+                            <div class="activity-list">
+                                <div class="activity-item"><img class="activity-avatar" src="https://i.pravatar.cc/36?u=a" alt="avatar"><div class="activity-content"><div class="activity-text"><strong>@playfulhorse</strong> is now following you</div><div class="activity-time">2 hours ago</div></div></div>
+                                <div class="activity-item"><img class="activity-avatar" src="https://i.pravatar.cc/36?u=b" alt="avatar"><div class="activity-content"><div class="activity-text"><strong>@funkyfox</strong> liked your comment "It's kinda weird that..."</div><div class="activity-time">18 hours ago</div></div></div>
+                                <div class="activity-item"><img class="activity-avatar" src="https://i.pravatar.cc/36?u=c" alt="avatar"><div class="activity-content"><div class="activity-text"><strong>@sadsheep</strong> replied to your review on "Choke"</div><div class="activity-time">1 day ago</div></div></div>
+                            </div>
+                        </div>
+                        <div class="section-card">
+                            <div class="section-header"><h2 class="section-title">Your reader activity</h2><select class="chart-dropdown" style="border:none;background:transparent;color:#6b7280;font-size:13px;"><option>This month</option></select></div>
+                            <div class="chart-controls"><button class="chart-tab active">Reviews</button><button class="chart-tab">Books added</button><button class="chart-tab">Discussions</button></div>
+                            <div class="chart-container"><canvas id="activityChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="right-column">
+                        <div class="section-card">
+                            <div class="section-header"><h2 class="section-title">Recently read</h2><a href="#" class="see-more">See more</a></div>
+                            <div class="carousel-container"><div class="books-carousel" id="booksCarousel"></div><div class="carousel-arrow right" onclick="scrollCarousel('right')">›</div></div>
+                        </div>
+                        <div class="section-card">
+                            <div class="section-header"><h2 class="section-title">Favourite genres</h2></div>
+                            <div class="genre-chart-container">
+                                <div class="genre-chart"><canvas id="genreChart"></canvas></div>
+                                <div class="genre-legend">
+                                    <div class="legend-item"><div class="legend-color" style="background: #4A6CFD;"></div>Science fiction <span class="legend-percentage">27%</span></div>
+                                    <div class="legend-item"><div class="legend-color" style="background: #4FD1C5;"></div>Adventures <span class="legend-percentage">15%</span></div>
+                                    <div class="legend-item"><div class="legend-color" style="background: #A3BFFA;"></div>Psychology <span class="legend-percentage">18%</span></div>
+                                    <div class="legend-item"><div class="legend-color" style="background: #2D3748;"></div>Philosophy <span class="legend-percentage">17%</span></div>
+                                    <div class="legend-item"><div class="legend-color" style="background: #718096;"></div>Fantasy <span class="legend-percentage">23%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-card">
+                            <div class="section-header"><h2 class="section-title">Favourite authors</h2></div>
+                            <div class="authors-grid"><div class="author-tag">Edgar Allan Poe</div><div class="author-tag">Ray Bradbury</div><div class="author-tag">Haruki Murakami</div><div class="author-tag">Stephen King</div><div class="author-tag">J.K. Rowling</div><div class="author-tag">J.R.R. Tolkien</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<!-- In: dashboard.html (at the bottom of the <body> tag) -->
+
+<!-- 1. Include your config file -->
+<script src="../config/appConfig.js"></script>
+<!-- 2. The main, dynamic script -->
+<script>
+       document.addEventListener('DOMContentLoaded', function() {
+        // --- CONFIG & DOM ELEMENTS ---
+        const API_BASE_URL = `${backendDomain}/api/books`;
+        const token = localStorage.getItem('mock_token');
+        
+        const categoryFilters = document.getElementById('category-filters'); // Assuming you have this
+        const booksGrid = document.getElementById('category-books-grid'); // Assuming you have a grid container
+        const pageTitle = document.getElementById('page-title'); // Assuming you have a title element
+
+        // --- STATE ---
+        let allBooks = [];
+        let selectedCategory = "All";
+
+        // --- DATA FETCHING ---
+        async function fetchBooksByCategory(category = "All") {
+            if (!token ) {
+                alert("You are not logged in.");
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            booksGrid.innerHTML = '<p>Loading books...</p>'; // Show loading state
+
+            try {
+                // Fetch both private and public books for the selected category
+                const privatePromise = fetch(`${API_BASE_URL}?category=${category}`, { headers: { 'Authorization': `Bearer ${token}` } }).then(res => res.ok ? res.json() : []);
+                const archivePromise = fetch(`${API_BASE_URL}/archive-popular?category=${category}`, { headers: { 'Authorization': `Bearer ${token}` } }).then(res => res.ok ? res.json() : []);
+
+                const [privateBooks, archiveBooks] = await Promise.all([privatePromise, archivePromise]);
+                
+                allBooks = [...privateBooks, ...archiveBooks].filter(book => book && book._id);
+                
+                renderBooksGrid();
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+                booksGrid.innerHTML = `<p class="text-red-500">Error loading books.</p>`;
+            }
+        }
+
+        // --- UI RENDERING ---
+        function renderBooksGrid() {
+            booksGrid.innerHTML = '';
+            if (allBooks.length === 0) {
+                booksGrid.innerHTML = '<p class="text-gray-500">No books found in this category.</p>';
+                return;
+            }
+            allBooks.forEach(book => {
+                booksGrid.appendChild(createBookCard(book));
+            });
+        }
+
+        function createBookCard(book) {
+            const card = document.createElement('div');
+            card.className = 'book-card'; // Use a consistent class for book cards
+            const coverUrl = book.coverUrl || `https://placehold.co/160x220/14213d/fca311?text=No+Cover`;
+            card.innerHTML = `
+                <img src="${coverUrl}" alt="${book.title}" style="height: 220px; object-fit: cover;">
+                <div style="padding: 12px;">
+                    <h3 style="font-weight: 600; margin-bottom: 4px;">${book.title}</h3>
+                    <p style="font-size: 14px; color: #555;">${book.author}</p>
+                </div>
+            `;
+            card.addEventListener('click', () => {
+                localStorage.setItem('selectedBook', JSON.stringify(book));
+                window.location.href = 'readbook.html';
+            });
+            return card;
+        }
+
+        function renderCategoryFilters() {
+            const categories = ["All", "General", "Business", "IT & CS", "Research"];
+            categoryFilters.innerHTML = '';
+            categories.forEach(cat => {
+                const btn = document.createElement("button");
+                btn.textContent = cat;
+                btn.className = (cat === selectedCategory) ? 'active' : '';
+                btn.addEventListener("click", () => {
+                    selectedCategory = cat;
+                    if (pageTitle) pageTitle.textContent = `${cat} Books`;
+                    renderCategoryFilters();
+                    fetchBooksByCategory(selectedCategory);
+                });
+                categoryFilters.appendChild(btn);
+            });
+        }
+
+        // --- INITIALIZATION ---
+        renderCategoryFilters();
+        fetchBooksByCategory("All"); // Fetch all books on initial load
+    });
+</script>
+<!-- At the end of the <body> of every page -->
+
+<!-- At the end of the <body> of every page -->
+<!-- In every HTML file, at the end of the <body> -->
+
+<!-- At the end of the <body> of every page -->
+<script src="../Javascript/componentUpload.js"></script>
+</body>
+</html>
+
+

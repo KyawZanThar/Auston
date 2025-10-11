@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Books - Auston</title>
+    
+    <!-- 1. Link to the main layout stylesheet -->
+    <link rel="stylesheet" href="../css/main.css">
+    
+    <!-- 2. Page-specific styles for the "My Books" page -->
+    <style>
+      /* In: Frontend/css/main.css */
+
+/* --- Reset & Base Styles --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f8f9fb; color: #1a1a1a; }
+html, body { height: 100%; overflow: hidden; }
+img { display: block; max-width: 100%; height: auto; }
+button { cursor: pointer; border: none; outline: none; background: none; font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+
+/* --- Main App Layout --- */
+.app { display: flex; height: 100vh; }
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    margin-left: 220px; /* This MUST match your sidebar width */
+}
+.content-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 32px 48px;
+}
+        .page-title { font-weight: 700; font-size: 24px; margin-bottom: 24px; color: #1a1a1a; }
+        .tabs { display: flex; gap: 32px; margin-bottom: 32px; border-bottom: 1px solid #ddd; }
+        .tab { font-weight: 600; font-size: 16px; padding-bottom: 8px; cursor: pointer; color: #555; border-bottom: 3px solid transparent; transition: color 0.3s ease, border-color 0.3s ease; }
+        .tab:hover { color: #14213d; }
+        .tab.active { color: #14213d; border-color: #fca311; font-weight: 700; }
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px 20px; }
+        .book-card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.05); padding: 12px; position: relative; display: flex; flex-direction: column; }
+        .book-card:hover { box-shadow: 0 6px 16px rgb(0 0 0 / 0.12); }
+        .book-image-container { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgb(0 0 0 / 0.1); margin-bottom: 12px; cursor: pointer; }
+        .book-image-container img { width: 100%; height: 140px; object-fit: cover; }
+        .badge, .duration-badge { position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.7); color: white; font-size: 11px; padding: 2px 6px; border-radius: 12px; }
+        .icon-heart, .icon-bookmark { position: absolute; top: 8px; width: 20px; height: 20px; cursor: pointer; fill: none; stroke: #fff; stroke-width: 2; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5)); }
+        .icon-heart { right: 36px; } .icon-bookmark { right: 8px; }
+        .icon-heart.liked { fill: #e63946; stroke: #e63946; }
+        .icon-bookmark.bookmarked { fill: #4a90e2; stroke: #4a90e2; }
+        .book-title { font-weight: 700; font-size: 14px; margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .book-author { font-size: 12px; color: #555; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .icons-row { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 8px; }
+        .icon-download, .icon-delete, .icon-play { width: 20px; height: 20px; cursor: pointer; fill: #555; transition: fill 0.2s ease; }
+        .icon-download:hover, .icon-delete:hover, .icon-play:hover { fill: #14213d; }
+        .icon-play { background: #eef2ff; border-radius: 50%; padding: 4px; box-sizing: content-box; fill: #4f46e5; }
+        .icon-play:hover { background: #e0e7ff; }
+        .progress-container { margin-top: 6px; font-size: 11px; color: #555; }
+        .progress-bar { width: 100%; height: 6px; background: #ddd; border-radius: 3px; overflow: hidden; margin-top: 2px; }
+        .progress-bar-fill { height: 100%; background: #4a90e2; width: 0%; }
+        .completed-text { margin-top: 6px; font-size: 12px; color: #4caf50; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="content-area">
+                <div class="w-full">
+                    <h1 class="page-title">My Books</h1>
+                    <form id="bookUploadForm" enctype="multipart/form-data" style="margin-bottom:32px; background:#f7f7f7; padding:24px; border-radius:12px; box-shadow:0 2px 8px #0001;">
+                        <h2 style="margin-bottom:16px; font-size:20px; font-weight: 600;">Upload a Book</h2>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                            <div>
+                                <label for="title" style="font-weight: 500; font-size: 14px; margin-bottom: 4px; display: block;">Title</label>
+                                <input type="text" id="title" name="title" required style="width:100%; padding:8px; border-radius: 6px; border: 1px solid #ddd;" />
+                            </div>
+                            <div>
+                                <label for="author" style="font-weight: 500; font-size: 14px; margin-bottom: 4px; display: block;">Author</label>
+                                <input type="text" id="author" name="author" required style="width:100%; padding:8px; border-radius: 6px; border: 1px solid #ddd;" />
+                            </div>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label for="description" style="font-weight: 500; font-size: 14px; margin-bottom: 4px; display: block;">Description</label>
+                            <textarea id="description" name="description" rows="2" style="width:100%; padding:8px; border-radius: 6px; border: 1px solid #ddd;"></textarea>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label for="file" style="font-weight: 500; font-size: 14px; margin-bottom: 4px; display: block;">Book File (PDF)</label>
+                            <input type="file" id="file" name="file" accept="application/pdf" required />
+                        </div>
+                        <button type="submit" style="background:#14213d; color:#fff; padding:10px 24px; border-radius:6px; font-weight:600;">Upload Book</button>
+                        <span id="uploadStatus" style="margin-left:16px; font-weight: 500;"></span>
+                    </form>
+
+                    <nav class="tabs" role="tablist">
+                        <button class="tab active" role="tab" data-tab="current">Current Reading</button>
+                        <button class="tab" role="tab" data-tab="completed">Completed Books</button>
+                        <button class="tab" role="tab" data-tab="favourite">Favourite</button>
+                        <button class="tab" role="tab" data-tab="bookmarks">Bookmarks</button>
+                    </nav>
+
+                    <section id="tab-panel-current" role="tabpanel"><div class="books-grid" id="current-reading-grid"></div></section>
+                    <section id="tab-panel-completed" role="tabpanel" hidden><div class="books-grid" id="completed-books-grid"></div></section>
+                    <section id="tab-panel-favourite" role="tabpanel" hidden><div class="books-grid" id="favourite-grid"></div></section>
+                    <section id="tab-panel-bookmarks" role="tabpanel" hidden><div class="books-grid" id="bookmarks-grid"></div></section>
+                </div>
+            </div>
+        </main>
+    </div>
+  <script src="../config/appConfig.js"></script>
+  <script>
+    // --- CONFIGURATION & STATE ---
+    const API_BASE_URL = `${backendDomain}/api/books`;
+    const token = localStorage.getItem('mock_token');
+    
+    // This will hold the real data from the backend
+    let myBooksData = [];
+
+    // --- HELPER FUNCTIONS ---
+    function sanitizeHTML(str) {
+        if (!str) return '';
+        const temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML;
+    }
+
+    function formatTime(seconds) {
+      if (isNaN(seconds) || seconds < 0) return "0:00";
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = Math.floor(seconds % 60);
+      if (h > 0) {
+        return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      } else {
+        return `${m}:${s.toString().padStart(2, '0')}`;
+      }
+    }
+
+    // --- DATA FETCHING & UPLOADING ---
+    async function fetchMyBooks() {
+        if (!token) {
+            document.body.innerHTML = '<h1>Access Denied. Please log in to view your books.</h1>';
+            return;
+        }
+        try {
+            const response = await fetch(`${API_BASE_URL}/my-uploads`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Could not fetch your books.');
+
+            const books = await response.json();
+            
+            // Add frontend-specific state to the fetched data.
+            myBooksData = books.map(book => ({
+                ...book,
+                liked: JSON.parse(localStorage.getItem(`liked_${book._id}`)) || false,
+                bookmarked: JSON.parse(localStorage.getItem(`bookmarked_${book._id}`)) || false,
+                completed: false, // In a real app, this would come from the DB
+                currentTime: 0,
+                totalSeconds: (book.pages || 200) * 90
+            }));
+
+            renderAllTabs();
+
+        } catch (error) {
+            console.error("Fetch error:", error);
+            document.getElementById('current-reading-grid').innerHTML = `<p class="text-red-500">${error.message}</p>`;
+        }
+    }
+
+    async function handleBookUpload(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const statusSpan = document.getElementById('uploadStatus');
+        statusSpan.textContent = 'Uploading...';
+        statusSpan.style.color = '#14213d';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/upload`, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: formData
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Upload failed.');
+
+            statusSpan.textContent = 'Book uploaded successfully!';
+            statusSpan.style.color = '#4caf50';
+            form.reset();
+            
+            // Re-fetch all books to include the new one
+            await fetchMyBooks();
+
+        } catch (err) {
+            statusSpan.textContent = err.message || 'Upload failed.';
+            statusSpan.style.color = '#e63946';
+        }
+    }
+
+    // --- UI RENDERING ---
+    function createBookCard(book) {
+        const card = document.createElement('article');
+        card.className = 'book-card';
+        card.dataset.bookId = book._id;
+
+        const coverUrl = book.coverUrl || `${backendDomain}${book.fileUrl}` || `https://placehold.co/400x240/14213d/fca311?text=${encodeURIComponent(book.title)}`;
+        
+        let badgeHTML = '';
+        if (book.completed) {
+            badgeHTML = `<div class="badge">${book.pages || 'N/A'} Pages</div>`;
+        } else if (book.totalSeconds) {
+            badgeHTML = `<div class="duration-badge">${formatTime(book.totalSeconds)}</div>`;
+        }
+
+        let progressHTML = '';
+        if (book.completed) {
+            progressHTML = `<div class="completed-text">Completed</div>`;
+        } else {
+            const percent = Math.min(100, (book.currentTime / book.totalSeconds) * 100);
+            progressHTML = `
+                <div class="progress-container">
+                    <div>${formatTime(book.currentTime)} / ${formatTime(book.totalSeconds)}</div>
+                    <div class="progress-bar"><div class="progress-bar-fill" style="width: ${percent}%;"></div></div>
+                </div>
+            `;
+        }
+
+        card.innerHTML = `
+            <div class="book-image-container">
+                <img src="${coverUrl}" alt="${sanitizeHTML(book.title)} cover">
+                ${badgeHTML}
+                <svg class="icon-heart ${book.liked ? 'liked' : ''}" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <svg class="icon-bookmark ${book.bookmarked ? 'bookmarked' : ''}" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <h3 class="book-title">${sanitizeHTML(book.title)}</h3>
+            <p class="book-author">${sanitizeHTML(book.author)}</p>
+            <div class="icons-row">
+                <svg class="icon-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <svg class="icon-delete" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <svg class="icon-play" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+            ${progressHTML}
+        `;
+
+        // Add Event Listeners
+        card.querySelector('.icon-heart').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const bookData = myBooksData.find(b => b._id === book._id);
+            bookData.liked = !bookData.liked;
+            localStorage.setItem(`liked_${book._id}`, bookData.liked); // Persist state
+            renderAllTabs();
+        });
+        card.querySelector('.icon-bookmark').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const bookData = myBooksData.find(b => b._id === book._id);
+            bookData.bookmarked = !bookData.bookmarked;
+            localStorage.setItem(`bookmarked_${book._id}`, bookData.bookmarked); // Persist state
+            renderAllTabs();
+        });
+        card.querySelector('.icon-play').addEventListener('click', (e) => {
+            e.stopPropagation();
+            localStorage.setItem('selectedBook', JSON.stringify(book));
+            window.location.href = `readbook.html`;
+        });
+        card.addEventListener('click', () => {
+            localStorage.setItem('selectedBook', JSON.stringify(book));
+            window.location.href = `readbook.html`;
+        });
+
+        return card;
+    }
+
+    function renderAllTabs() {
+        renderTab('current-reading-grid', b => !b.completed);
+        renderTab('completed-books-grid', b => b.completed);
+        renderTab('favourite-grid', b => b.liked);
+        renderTab('bookmarks-grid', b => b.bookmarked);
+    }
+
+    function renderTab(containerId, filterFn) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const books = myBooksData.filter(filterFn);
+        if (books.length > 0) {
+            books.forEach(book => container.appendChild(createBookCard(book)));
+        } else {
+            container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-8">No books in this category.</p>';
+        }
+    }
+
+    // --- TABS SWITCHING LOGIC ---
+    function setupTabs() {
+        const tabs = document.querySelectorAll('.tab');
+        const tabPanels = document.querySelectorAll('section[role="tabpanel"]');
+        tabs.forEach((tab, i) => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabPanels.forEach(p => p.hidden = true);
+                tab.classList.add('active');
+                tabPanels[i].hidden = false;
+            });
+        });
+    }
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        setupTabs();
+        document.getElementById('bookUploadForm').addEventListener('submit', handleBookUpload);
+        fetchMyBooks();
+    });
+  </script>
+  <script src="../Javascript/componentUpload.js"></script>
+</body>
+
+</html>
