@@ -84,17 +84,22 @@ document.addEventListener("DOMContentLoaded", function() {
         const container = document.querySelector('.profile-dropdown-container');
         const button = document.getElementById('profile-menu-button');
         const logoutButton = document.getElementById('logout-button');
+        const menu = document.getElementById('profile-dropdown-menu'); // <-- Get the menu element
 
         if (!container || !button) {
             setTimeout(initializeProfileDropdown, 100);
             return;
         }
 
-        button.addEventListener('click', (e) => {
-            e.stopPropagation(); 
-            container.classList.toggle('open');
-            const isExpanded = container.classList.contains('open');
-            button.setAttribute('aria-expanded', isExpanded);
+         button.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        const isOpen = container.classList.toggle('open');
+        
+        // --- THIS IS THE CRITICAL FIX ---
+        // Manually toggle the display of the menu
+        menu.style.display = isOpen ? 'block' : 'none';
+        
+        button.setAttribute('aria-expanded', isOpen);
         });
         
         if (logoutButton) {
