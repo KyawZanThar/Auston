@@ -1,7 +1,10 @@
-// In: Javascript/componentUpload.js
+// In: Javascript/componentUpload.js (REPLACE THE ENTIRE FILE)
 
 document.addEventListener("DOMContentLoaded", function() {
     
+    /**
+     * Fetches an HTML component and its corresponding CSS file.
+     */
     const loadComponent = (componentName) => {
         const htmlUrl = `../components/${componentName}.html`;
         const cssUrl = `../css/${componentName}.css`;
@@ -20,28 +23,61 @@ document.addEventListener("DOMContentLoaded", function() {
                 const placeholder = document.getElementById(placeholderId);
                 if (placeholder) placeholder.innerHTML = data;
                 
+                // After injecting the HTML, run component-specific logic
                 if (componentName === 'sidebar') {
                     setActiveSidebarLink();
                 }
                 if (componentName === 'topbar') {
                     updateUserProfileDisplay();
-                    // --- 1. ADD THIS ONE LINE ---
                     initializeProfileDropdown(); 
                 }
             })
             .catch(error => console.error(`Error loading component '${componentName}':`, error));
     };
 
+    /**
+     * Finds the current page and applies the '.active' class to the correct sidebar item.
+     * THIS FUNCTION FIXES THE "FOCUS EFFECT".
+     */
     const setActiveSidebarLink = () => {
-        // ... (your existing, correct active link logic) ...
-    };
-
-    const updateUserProfileDisplay = () => {
-        // ... (your existing, correct profile display logic) ...
+        const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+        setTimeout(() => {
+            const listItems = document.querySelectorAll('.sidebar nav ul li[data-page]');
+            listItems.forEach(li => {
+                li.classList.toggle('active', li.dataset.page === currentPage);
+            });
+        }, 100);
     };
 
     /**
-     * --- 2. ADD THIS ENTIRE NEW FUNCTION ---
+     * Finds the user's info in localStorage and updates the top bar display.
+     * THIS FUNCTION FIXES THE USER PROFILE DISPLAY.
+     */
+    const updateUserProfileDisplay = () => {
+        try {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                const userNameElement = document.querySelector('.top-bar .user-name');
+                const userAvatarElement = document.querySelector('.top-bar .user-avatar');
+
+                if (userNameElement) {
+                    userNameElement.textContent = currentUser.username || 'User';
+                }
+                if (userAvatarElement) {
+                    if (currentUser.avatarUrl) {
+                        userAvatarElement.src = `${backendDomain}${currentUser.avatarUrl}`;
+                    } else {
+                        userAvatarElement.src = `https://i.pravatar.cc/40?u=${currentUser.id}`;
+                    }
+                    userAvatarElement.alt = `${currentUser.username}'s Avatar`;
+                }
+            }
+        } catch (e) {
+            console.error("Could not update user profile in top bar:", e);
+        }
+    };
+
+    /**
      * Attaches event listeners to make the profile dropdown work.
      */
     const initializeProfileDropdown = () => {
@@ -49,14 +85,12 @@ document.addEventListener("DOMContentLoaded", function() {
         const button = document.getElementById('profile-menu-button');
         const logoutButton = document.getElementById('logout-button');
 
-        // This check is important. If elements aren't found, it tries again.
         if (!container || !button) {
             setTimeout(initializeProfileDropdown, 100);
             return;
         }
 
         button.addEventListener('click', (e) => {
-            // Stop the window listener from immediately closing the dropdown
             e.stopPropagation(); 
             container.classList.toggle('open');
             const isExpanded = container.classList.contains('open');
@@ -73,10 +107,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 
-    // Add a single, global listener to close the dropdown when clicking anywhere else
+    // Add a global listener to close the dropdown when clicking anywhere else
     window.addEventListener('click', function(e) {
         const container = document.querySelector('.profile-dropdown-container');
-        // Check if the container exists and if the click was outside of it
         if (container && !container.contains(e.target)) {
             container.classList.remove('open');
             const button = document.getElementById('profile-menu-button');
@@ -84,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // --- INITIALIZATION (Unchanged) ---
+    // --- INITIALIZATION ---
     loadComponent('sidebar');
     loadComponent('topbar');
 });
