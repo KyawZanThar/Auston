@@ -1,0 +1,29 @@
+[33mcommit c5d3232c649426a36d39f78eef2a0cf8647047b8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Kyaw Zan Thar <kyawzanthar@st.austonedu.mm>
+Date:   Mon Oct 13 11:12:27 2025 +0630
+
+    Space
+
+[33mcommit 0eaabe148ff736138e407c0919c9f9c026dc7472[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: KyawZanThar <168415006+KyawZanThar@users.noreply.github.com>
+Date:   Mon Oct 13 10:45:27 2025 +0630
+
+    Fix formatting in jekyll-docker.yml
+
+[33mcommit cf364e8ead7b48e4516dd2f11974806577cbbec7[m
+Author: Kyaw Zan Thar <kyawzanthar@st.austonedu.mm>
+Date:   Mon Oct 13 09:41:04 2025 +0630
+
+    Change to nav-menu from nav
+
+[33mcommit 622228c1a6b1da9ccfcf34736df81732c9dfff19[m
+Author: KyawZanThar <168415006+KyawZanThar@users.noreply.github.com>
+Date:   Mon Oct 13 09:36:54 2025 +0630
+
+    Change nav class from 'nav-menu' to 'nav'
+
+[33mcommit 8c713a371e0da0b5f27d3bf035b180af60833172[m
+Author: Kyaw Zan Thar <kyawzanthar@st.austonedu.mm>
+Date:   Sat Oct 11 14:07:27 2025 +0630
+
+    Initial commit
