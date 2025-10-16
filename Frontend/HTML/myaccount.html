@@ -11,76 +11,133 @@
     <link rel="stylesheet" href="../CSS/topbar.css">
 </head>
 <body>
-     <div class="app">
+   <div class="app">
         <div id="sidebar-placeholder"></div>
         <main class="main-content">
             <div id="topbar-placeholder"></div>
             <div class="content-area">
-                <div class="settings-container">
+                
+                <!-- Ensure this is the ONLY element with id="profile-form" -->
+                <form class="settings-container" id="profile-form">
                     <section class="settings-section">
                         <h2>Manage Account</h2>
                         <div class="settings-row">
                             <div class="settings-label">Full Name</div>
-                            <!-- Add an ID to the input field -->
-                            <div class="settings-value"><input type="text" id="fullNameInput" value="" /></div>
-                        </div>
-                        <div class="settings-row">
-                            <div class="settings-label">Username</div>
-                            <!-- Add an ID to the input field -->
-                            <div class="settings-value"><input type="text" id="usernameInput" value="" /></div>
+                            <div class="settings-value"><input type="text" id="fullNameInput" name="username" /></div>
                         </div>
                         <div class="settings-row">
                             <div class="settings-label">Profile Picture</div>
-                            <!-- Add an ID to the img tag -->
                             <div class="settings-value"><img class="profile-pic-img" id="profilePicImg" src="https://placehold.co/48x48" alt="Profile Picture" /></div>
-                            <div><button class="btn">Upload</button></div>
+                            <div>
+                                <button type="button" class="btn" id="uploadButton">Upload</button>
+                                <input type="file" id="avatarUpload" name="avatar" accept="image/*" style="display: none;">
+                            </div>
                         </div>
                     </section>
                     <!-- ... other sections ... -->
                     <div class="save-section">
-                        <button class="save-btn">Save Changes</button>
+                        <button type="submit" class="save-btn">Save Changes</button>
                     </div>
-                </div>
+                </form>
+                
             </div>
         </main>
     </div>
-
     <!-- SCRIPTS -->
-    <script src="../config/appConfig.js"></script>
-    <script src="../Javascript/componentUpload.js">
-        // --- PASTE YOUR COMPLETE, WORKING COMPONENT-LOADING SCRIPT HERE ---
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Get the user data that was saved during login
+    <!-- In: myaccount.html (at the end of the <body>) -->
+
+<script src="../config/appConfig.js"></script>
+<!-- In: myaccount.html (this is the main script for the page) -->
+<script>
+    // --- THIS IS THE CRITICAL FIX ---
+    // We wrap ALL the code in one DOMContentLoaded listener.
+   document.addEventListener("DOMContentLoaded", function() {
+            
+            // --- THIS IS THE CRITICAL FIX ---
+            // We will add a check right at the beginning.
+            const form = document.getElementById('profile-form');
+
+            // If the form cannot be found, stop immediately and show an error.
+            if (!form) {
+                console.error("FATAL ERROR: Could not find the element with id='profile-form'. The script cannot continue.");
+                alert("A critical page error occurred. Could not initialize the settings form.");
+                return; // Stop all further execution
+            }
+            
+            // If we get past this point, we know 'form' is a valid element.
+
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const token = localStorage.getItem('mock_token');
 
-            if (currentUser) {
-                // Find the elements in the form
-                const fullNameInput = document.getElementById('fullNameInput');
-                const usernameInput = document.getElementById('usernameInput');
-                const profilePicImg = document.getElementById('profilePicImg');
+            if (!currentUser || !token) {
+                window.location.href = 'login.html';
+                return;
+            }
 
-                // Populate the form fields with the user's data
-                if (fullNameInput) {
-                    // Assuming 'username' from the token is the full name
-                    fullNameInput.value = currentUser.username || '';
-                }
-                if (usernameInput) {
-                    // Let's use the email prefix as a username for now
-                    usernameInput.value = currentUser.email ? currentUser.email.split('@')[0] : '';
-                }
+            // --- DOM ELEMENTS ---
+            const fullNameInput = document.getElementById('fullNameInput');
+            const profilePicImg = document.getElementById('profilePicImg');
+            const avatarUploadInput = document.getElementById('avatarUpload');
+            const uploadButton = document.getElementById('uploadButton');
+            const saveButton = form.querySelector('.save-btn'); // This is now safe
+
+            function populateForm() {
+                if (fullNameInput) fullNameInput.value = currentUser.username || '';
                 if (profilePicImg) {
                     if (currentUser.avatarUrl) {
-                        // If the user has a custom avatar, use it
                         profilePicImg.src = `${backendDomain}${currentUser.avatarUrl}`;
                     } else {
-                        // Otherwise, fall back to the dynamic Pravatar image
                         profilePicImg.src = `https://i.pravatar.cc/150?u=${currentUser.id}`;
                     }
                 }
             }
+
+            if (uploadButton) {
+                uploadButton.addEventListener('click', () => avatarUploadInput.click());
+            }
+            if (avatarUploadInput) {
+                avatarUploadInput.addEventListener('change', function(event) {
+                    const [file] = event.target.files;
+                    if (file) profilePicImg.src = URL.createObjectURL(file);
+                });
+            }
+
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                saveButton.disabled = true;
+                saveButton.textContent = 'Saving...';
+                try {
+                    const formData = new FormData();
+                    formData.append('username', fullNameInput.value);
+                    if (avatarUploadInput.files[0]) {
+                        formData.append('avatar', avatarUploadInput.files[0]);
+                    }
+                    const response = await fetch(`${backendDomain}/api/users/profile`, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message || 'Failed to update profile.');
+                    
+                    localStorage.setItem('mock_token', result.token);
+                    localStorage.setItem('currentUser', JSON.stringify(result.user));
+                    alert('Profile updated successfully!');
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Update failed:', error);
+                    alert(`Error: ${error.message}`);
+                } finally {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Save Changes';
+                }
+            });
+
+            populateForm();
         });
     </script>
+
+<!-- Your component loader script goes here -->
+<script src="../Javascript/componentUpload.js"></script>
 </body>
 </html>

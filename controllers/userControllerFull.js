@@ -140,8 +140,69 @@ const listUsers = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
+// In: backend/controllers/userControllerFull.js
+
+// ... your other functions (register, login, etc.) ...
+
+// In: backend/controllers/userControllerFull.js
+
+// Replace your existing, placeholder 'updateProfile' function with this one
+const updateProfile = async (req, res, next) => {
+    try {
+        // 1. Get the user ID from the authenticated token (provided by auth.js)
+        const userId = req.user.id;
+        
+        // 2. Get the new username from the form data
+        const { username } = req.body;
+
+        // 3. Prepare an object with the data to be updated
+        const updateData = {};
+        if (username) {
+            updateData.username = username;
+        }
+
+        // 4. Check if a new avatar file was uploaded by the 'uploadImage' middleware
+        if (req.file) {
+            // The path should be what the browser will use to access the file
+            updateData.avatarUrl = `/avatars/${req.file.filename}`;
+        }
+
+        // 5. Find the user by their ID and update their data in the database
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updateData },
+            { new: true, runValidators: true } // 'new: true' returns the updated document
+        ).select('-password'); // Exclude the password from the response
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        
+        // 6. Create a NEW token with the updated user information
+        const payload = {
+            id: updatedUser.id,
+            role: updatedUser.role,
+            austonId: updatedUser.austonId,
+            email: updatedUser.email,
+            username: updatedUser.username,
+            avatarUrl: updatedUser.avatarUrl // Include the new avatar URL
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '2h' });
+
+        // 7. Send the new token and the updated user object back to the frontend
+        res.json({
+            message: 'Profile updated successfully.',
+            token: token,
+            user: payload
+        });
+
+    } catch (err) {
+        console.error("Error during profile update:", err.message);
+        next(err);
+    }
+};
 // Placeholder functions for any other routes you might have
-const updateProfile = async (req, res, next) => { res.status(501).json({ message: 'Not implemented yet.' }); };
+
 const deleteUser = async (req, res, next) => { res.status(501).json({ message: 'Not implemented yet.' }); };
 
 

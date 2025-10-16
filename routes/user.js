@@ -22,7 +22,8 @@ router.post('/login', userCtrl.login);
 
 // Protected routes (require a valid token)
 router.get('/profile', auth.authenticate, userCtrl.profile);
-router.patch('/profile', auth.authenticate, userCtrl.updateProfile);
+router.patch('/profile', auth.authenticate, uploadImage.single('avatar'), userCtrl.updateProfile);
+
 
 // Admin-only routes (require token AND 'admin' role)
 // This is the line that was causing the crash. It is now clean.

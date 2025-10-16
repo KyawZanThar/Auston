@@ -30,10 +30,15 @@ function fileFilter (req, file, cb) {
   cb(new Error('Error: Only image files (jpeg, jpg, png, gif) are allowed!'));
 }
 
+// In: backend/middleware/upload-image.js
+
+// Find this part of your file
 const uploadImage = multer({
     storage: storage,
     fileFilter: fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit for profile pictures
+    // --- THIS IS THE PART TO CHANGE ---
+    limits: { fileSize: 15 * 1024 * 1024 } // Increased limit to 10MB
 });
 
 module.exports = uploadImage;
+
