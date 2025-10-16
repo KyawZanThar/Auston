@@ -201,6 +201,50 @@ const updateProfile = async (req, res, next) => {
         next(err);
     }
 };
+
+// In: backend/controllers/userControllerFull.js
+
+// ... your other functions (register, login, etc.) ...
+
+// --- ADD THIS NEW FUNCTION ---
+const changePassword = async (req, res, next) => {
+    try {
+        // 1. Get the data from the form
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user.id;
+
+        // 2. Basic validation
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: 'Current and new passwords are required.' });
+        }
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: 'New password must be at least 6 characters long.' });
+        }
+
+        // 3. Find the user in the database
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // 4. Verify the CURRENT password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect current password.' });
+        }
+
+        // 5. Hash and save the NEW password
+        // The pre-save hook in your User.js model will handle the hashing automatically.
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: 'Password updated successfully.' });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
 // Placeholder functions for any other routes you might have
 
 const deleteUser = async (req, res, next) => { res.status(501).json({ message: 'Not implemented yet.' }); };
@@ -214,5 +258,6 @@ module.exports = {
     profile,
     listUsers,
     updateProfile,
-    deleteUser
+    deleteUser,
+    changePassword
 };

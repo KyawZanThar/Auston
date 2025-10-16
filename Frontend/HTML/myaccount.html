@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Auston Book - Settings</title>
+    <title>Auston Book - My Account</title>
     
-    <!-- 1. Link to the new, single, central stylesheet -->
+    <!-- Link to your CSS files -->
     <link rel="stylesheet" href="../CSS/myaccount.css">
     <link rel="stylesheet" href="../CSS/sidebar.css">
     <link rel="stylesheet" href="../CSS/topbar.css">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
    <div class="app">
@@ -17,127 +24,192 @@
             <div id="topbar-placeholder"></div>
             <div class="content-area">
                 
-                <!-- Ensure this is the ONLY element with id="profile-form" -->
-                <form class="settings-container" id="profile-form">
-                    <section class="settings-section">
-                        <h2>Manage Account</h2>
-                        <div class="settings-row">
-                            <div class="settings-label">Full Name</div>
-                            <div class="settings-value"><input type="text" id="fullNameInput" name="username" /></div>
-                        </div>
-                        <div class="settings-row">
-                            <div class="settings-label">Profile Picture</div>
-                            <div class="settings-value"><img class="profile-pic-img" id="profilePicImg" src="https://placehold.co/48x48" alt="Profile Picture" /></div>
-                            <div>
-                                <button type="button" class="btn" id="uploadButton">Upload</button>
-                                <input type="file" id="avatarUpload" name="avatar" accept="image/*" style="display: none;">
+                <!-- START: Profile Content -->
+                <div class="profile-main">
+                    <section class="profile-container">
+
+                        <!-- Account Information Panel -->
+                        <article class="account-info-panel">
+                            <h2 class="panel-title">Account Information</h2>
+                            <div class="info-grid">
+                                <!-- IDs added for dynamic data -->
+                                <div class="info-item">
+                                    <span class="info-label">Email</span>
+                                    <span class="info-value" id="profile-email">loading...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">University ID</span>
+                                    <span class="info-value" id="profile-university-id">loading...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Department / Faculty</span>
+                                    <span class="info-value" id="profile-department">Computer Science & Engineering</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Role</span>
+                                    <span class="info-value" id="profile-role">loading...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Registration date</span>
+                                    <!-- Added data- attribute for the raw date -->
+                                    <span class="info-value" id="profile-reg-date" data-date="">loading...</span>
+                                </div>
                             </div>
-                        </div>
+                            <!-- This can link to a modal or another page for editing -->
+                            <button class="edit-profile-btn" id="editProfileBtn">Edit Profile</button>
+                        </article>
+
+                        <!-- Quick Summary Cards (These are static links, but counts could be dynamic later) -->
+                        <section class="summary-cards">
+                            <a href="/bookmarks" class="summary-card">
+                                <i class="fas fa-bookmark card-icon"></i>
+                                <span class="card-label">Bookmarks</span>
+                                <span class="card-count">42</span>
+                            </a>
+                            <a href="/reading" class="summary-card">
+                                <i class="fas fa-clock card-icon"></i>
+                                <span class="card-label">Current Reading</span>
+                                <span class="card-count">3</span>
+                            </a>
+                            <a href="/activity" class="summary-card">
+                                <i class="fas fa-file-alt card-icon"></i>
+                                <span class="card-label">Resources Accessed</span>
+                                <span class="card-count">187</span>
+                            </a>
+                        </section>
+
+                        <!-- Actions Section -->
+                        <section class="action-buttons">
+                            <button class="action-btn change-password" id="changePasswordBtn">
+                                <i class="fas fa-lock"></i> Change Password
+                            </button>
+                            <button class="action-btn logout" id="logoutBtn">
+                                Logout <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </section>
+
                     </section>
-                    <!-- ... other sections ... -->
-                    <div class="save-section">
-                        <button type="submit" class="save-btn">Save Changes</button>
-                    </div>
-                </form>
+                </div>
+                <!-- END: Profile Content -->
                 
             </div>
         </main>
     </div>
+</body>
     <!-- SCRIPTS -->
-    <!-- In: myaccount.html (at the end of the <body>) -->
+    <script src="../config/appConfig.js"></script>
+    
 
-<script src="../config/appConfig.js"></script>
-<!-- In: myaccount.html (this is the main script for the page) -->
-<script>
-    // --- THIS IS THE CRITICAL FIX ---
-    // We wrap ALL the code in one DOMContentLoaded listener.
-   document.addEventListener("DOMContentLoaded", function() {
-            
-            // --- THIS IS THE CRITICAL FIX ---
-            // We will add a check right at the beginning.
-            const form = document.getElementById('profile-form');
 
-            // If the form cannot be found, stop immediately and show an error.
-            if (!form) {
-                console.error("FATAL ERROR: Could not find the element with id='profile-form'. The script cannot continue.");
-                alert("A critical page error occurred. Could not initialize the settings form.");
-                return; // Stop all further execution
-            }
-            
-            // If we get past this point, we know 'form' is a valid element.
+    <!-- SCRIPTS -->
 
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const token = localStorage.getItem('mock_token');
+    <script>
+        // In: Frontend/Javascript/myaccount.js
 
-            if (!currentUser || !token) {
-                window.location.href = 'login.html';
-                return;
-            }
+// In: Frontend/Javascript/myaccount.js
 
-            // --- DOM ELEMENTS ---
-            const fullNameInput = document.getElementById('fullNameInput');
-            const profilePicImg = document.getElementById('profilePicImg');
-            const avatarUploadInput = document.getElementById('avatarUpload');
-            const uploadButton = document.getElementById('uploadButton');
-            const saveButton = form.querySelector('.save-btn'); // This is now safe
+document.addEventListener('DOMContentLoaded', () => {
+    // Select elements that will display dynamic data
+    const profileEmail = document.getElementById('profile-email');
+    const profileUniversityId = document.getElementById('profile-university-id');
+    const profileRole = document.getElementById('profile-role');
+    const profileRegDate = document.getElementById('profile-reg-date');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const changePasswordBtn = document.getElementById('changePasswordBtn');
 
-            function populateForm() {
-                if (fullNameInput) fullNameInput.value = currentUser.username || '';
-                if (profilePicImg) {
-                    if (currentUser.avatarUrl) {
-                        profilePicImg.src = `${backendDomain}${currentUser.avatarUrl}`;
-                    } else {
-                        profilePicImg.src = `https://i.pravatar.cc/150?u=${currentUser.id}`;
-                    }
-                }
-            }
+    // --- 1. Check for token and fetch user data ---
+    const token = localStorage.getItem('mock_token');
+    if (!token) {
+        // If no token is found, redirect to the login page
+        window.location.href = '/login.html'; // Adjust this path if needed
+        return;
+    }
 
-            if (uploadButton) {
-                uploadButton.addEventListener('click', () => avatarUploadInput.click());
-            }
-            if (avatarUploadInput) {
-                avatarUploadInput.addEventListener('change', function(event) {
-                    const [file] = event.target.files;
-                    if (file) profilePicImg.src = URL.createObjectURL(file);
-                });
-            }
+    // --- 2. Function to populate the profile fields ---
+    const populateProfileData = (user) => {
+        if (!user) {
+            console.error('User data is not available.');
+            return;
+        }
+        
+        profileEmail.textContent = user.email || 'N/A';
+        profileUniversityId.textContent = user.austonId ? `${user.austonId} (Read-Only)` : 'N/A';
+        profileRole.textContent = user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'N/A';
+        
+        // Format the registration date
+        if (user.createdAt) {
+            const date = new Date(user.createdAt);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            profileRegDate.textContent = date.toLocaleDateString('en-US', options);
+        } else {
+            profileRegDate.textContent = 'N/A';
+        }
+    };
 
-            form.addEventListener('submit', async function(event) {
-                event.preventDefault();
-                saveButton.disabled = true;
-                saveButton.textContent = 'Saving...';
-                try {
-                    const formData = new FormData();
-                    formData.append('username', fullNameInput.value);
-                    if (avatarUploadInput.files[0]) {
-                        formData.append('avatar', avatarUploadInput.files[0]);
-                    }
-                    const response = await fetch(`${backendDomain}/api/users/profile`, {
-                        method: 'PATCH',
-                        headers: { 'Authorization': `Bearer ${token}` },
-                        body: formData
-                    });
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.message || 'Failed to update profile.');
-                    
-                    localStorage.setItem('mock_token', result.token);
-                    localStorage.setItem('currentUser', JSON.stringify(result.user));
-                    alert('Profile updated successfully!');
-                    window.location.reload();
-                } catch (error) {
-                    console.error('Update failed:', error);
-                    alert(`Error: ${error.message}`);
-                } finally {
-                    saveButton.disabled = false;
-                    saveButton.textContent = 'Save Changes';
+    // --- 3. Fetch user profile from the backend ---
+    const fetchUserProfile = async () => {
+        try {
+            const response = await fetch(`${backendDomain}/api/users/profile`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Send the token for authentication
                 }
             });
 
-            populateForm();
-        });
-    </script>
+            if (!response.ok) {
+                // If the token is invalid or expired, clear it and redirect to login
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                }
+                throw new Error('Failed to fetch user profile.');
+            }
 
-<!-- Your component loader script goes here -->
-<script src="../Javascript/componentUpload.js"></script>
+            const user = await response.json();
+            populateProfileData(user);
+
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            // Optionally display an error message to the user
+        }
+    };
+
+    // --- 4. Event Listeners ---
+    
+    // Logout Button
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            // Remove the token and user data from local storage
+            localStorage.removeItem('token');
+            localStorage.removeItem('user'); // Also clear user object if you stored it
+            
+            // Redirect to the login page
+            window.location.href = '/login.html'; // Adjust path if needed
+        });
+    }
+
+    // Edit Profile Button (can redirect to an edit page or open a modal)
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', () => {
+            // For now, an alert. This could redirect to a settings page.
+            alert('Redirecting to the profile edit page is not yet implemented.');
+            // window.location.href = '/settings.html';
+        });
+    }
+    
+    // Change Password Button (can open a modal)
+    if (changePasswordBtn) {
+        changePasswordBtn.addEventListener('click', () => {
+            alert('The "Change Password" modal is not yet implemented.');
+        });
+    }
+
+    // --- 5. Initial call to fetch and display data ---
+    fetchUserProfile();
+});
+    </script> <!-- Link to the new JS file -->
+    <script src="../Javascript/componentUpload.js"></script>
 </body>
 </html>
