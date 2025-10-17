@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile Popup</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS Variables and Base Styles --- */
+:root {
+    --primary-blue: #09244F;
+    --accent-yellow: #FFCC08;
+    --light-gray: #f0f4f8;
+    --medium-gray: #e1e5e9;
+    --dark-gray: #555;
+    --text-color: #333;
+    --white: #ffffff;
+    --danger-red: #d9534f;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--light-gray);
+    color: var(--text-color);
+}
+
+/* --- App Placeholder Styles --- */
+.app-content {
+    padding: 2rem;
+    transition: filter 0.3s ease-in-out;
+}
+.app-content.blurred {
+    filter: blur(5px);
+    pointer-events: none;
+}
+
+/* --- Modal Overlay and Content --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background-color: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease-in-out;
+}
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--dark-gray);
+}
+
+/* --- Modal Header --- */
+.modal-header {
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid var(--medium-gray);
+}
+.modal-header h2 {
+    font-size: 1.5rem;
+    color: var(--primary-blue);
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+.modal-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background-color: var(--accent-yellow);
+}
+
+/* --- Form Styles --- */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-grow: 1;
+}
+.form-main-content {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    overflow-y: auto;
+}
+.form-column {
+    flex: 1;
+    min-width: 0;
+}
+.form-column h3 {
+    font-size: 1.1rem;
+    color: var(--primary-blue);
+    margin-bottom: 1.5rem;
+}
+
+/* --- Form Groups and Fields --- */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+    position: relative;
+    padding-left: 12px;
+}
+.form-group label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 4px;
+    height: 16px;
+    background-color: var(--accent-yellow);
+    border-radius: 2px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--medium-gray);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-yellow);
+    box-shadow: 0 0 0 3px rgba(255, 204, 8, 0.3);
+}
+input[readonly] {
+    background-color: #f9fafb;
+    cursor: not-allowed;
+}
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+}
+
+/* --- Photo Upload --- */
+.photo-upload-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+.photo-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-yellow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9fafb;
+    overflow: hidden;
+}
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.camera-icon { color: var(--primary-blue); }
+
+/* --- Toggle Switch --- */
+.toggle-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.toggle-group label { margin-bottom: 0; }
+.switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 28px; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--primary-blue); }
+input:checked + .slider:before { transform: translateX(22px); }
+
+/* --- Password Fields Container --- */
+.password-fields {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
+}
+.password-fields.visible {
+    max-height: 300px; /* Adjust as needed */
+}
+
+/* --- Connect Account Area --- */
+.connect-account-area { border-top: 1px solid var(--medium-gray); padding-top: 1.5rem; }
+.orcid-info { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+.connect-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 10px 16px;
+    border: 1px solid var(--medium-gray);
+    border-radius: 8px;
+    background-color: var(--white);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* --- Modal Footer and Buttons --- */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--medium-gray);
+    background-color: #f9fafb;
+}
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-save {
+    background-color: var(--primary-blue);
+    color: var(--white);
+}
+.btn-save:hover {
+    box-shadow: 0 4px 15px rgba(9, 36, 79, 0.3);
+    transform: translateY(-2px);
+}
+.btn-cancel {
+    background-color: var(--white);
+    color: var(--danger-red);
+    border: 1px solid var(--danger-red);
+}
+.btn-cancel:hover {
+    background-color: #fff5f5;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .form-main-content {
+        flex-direction: column;
+        gap: 0;
+    }
+    .form-column h3 {
+        margin-top: 2rem;
+    }
+    .modal-footer {
+        flex-direction: column-reverse; /* Stack buttons vertically */
+    }
+    .btn {
+        justify-content: center; /* Center button content */
+    }
+}
+    </style>
+</head>
+<body>
+
+    <!-- Placeholder for the main app content -->
+    <main class="app-content">
+        <h1>User Profile Page</h1>
+        <p>This is the main content of the university library app.</p>
+        <button id="open-modal-btn">Edit Profile</button>
+    </main>
+
+    <!-- The Modal Overlay -->
+    <div class="modal-overlay" id="profile-modal-overlay">
+        
+        <!-- The Modal Content Card -->
+        <div class="modal-content">
+            
+            <!-- Close Button -->
+            <button class="close-btn" id="close-modal-btn" aria-label="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+
+            <!-- Modal Header -->
+            <header class="modal-header">
+                <h2>Edit Your Profile</h2>
+            </header>
+
+            <!-- Main Form Content -->
+            <form class="profile-form">
+                <div class="form-main-content">
+                    <!-- Left Column: General Info -->
+                    <div class="form-column">
+                        <div class="form-group photo-upload-area">
+                            <label for="photo-upload" class="photo-upload-label">
+                                <div class="photo-preview" id="photo-preview">
+                                    <svg class="camera-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                </div>
+                                <span>Change Photo</span>
+                            </label>
+                            <input type="file" id="photo-upload" accept="image/*" hidden>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" value="user.name@university.edu" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="first-name">First Name</label>
+                            <input type="text" id="first-name" placeholder="Enter your first name">
+                        </div>
+                        <div class="form-group">
+                            <label for="last-name">Last Name</label>
+                            <input type="text" id="last-name" placeholder="Enter your last name">
+                        </div>
+                        <div class="form-group">
+                            <label for="student-id">Student/Staff ID</label>
+                            <input type="text" id="student-id" placeholder="e.g., UN123456">
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Role</label>
+                            <select id="role">
+                                <option value="student" selected>Student</option>
+                                <option value="faculty">Faculty</option>
+                                <option value="staff">Staff</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="department">Department / Faculty</label>
+                            <select id="department">
+                                <option value="cs" selected>Computer Science & Engineering</option>
+                                <option value="business">Business School</option>
+                                <option value="arts">Arts & Humanities</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Security & Access -->
+                    <div class="form-column">
+                        <h3>Security & Access</h3>
+                        <div class="form-group toggle-group">
+                            <label for="change-password-toggle">Change Password</label>
+                            <label class="switch">
+                                <input type="checkbox" id="change-password-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="password-fields" id="password-fields-container">
+                            <div class="form-group">
+                                <label for="current-password">Current Password</label>
+                                <input type="password" id="current-password" placeholder="Enter current password">
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">New Password</label>
+                                <input type="password" id="new-password" placeholder="Enter new password">
+                            </div>
+                        </div>
+
+                        <div class="form-group toggle-group">
+                            <label for="some-setting-toggle">Enable Special Access</label>
+                            <label class="switch">
+                                <input type="checkbox" id="some-setting-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group connect-account-area">
+                            <div class="orcid-info">
+                                <img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" alt="ORCID icon">
+                                <span>Link your ORCID Profile</span>
+                            </div>
+                            <button type="button" class="connect-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>
+                                Connect Accounts
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer with Action Buttons -->
+                <footer class="modal-footer">
+                    <button type="button" class="btn btn-cancel" id="cancel-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-save">Save Changes</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    // --- Element Selections ---
+    const modalOverlay = document.getElementById('profile-modal-overlay');
+    const openModalBtn = document.getElementById('open-modal-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const appContent = document.querySelector('.app-content');
+    
+    const photoUploadInput = document.getElementById('photo-upload');
+    const photoPreview = document.getElementById('photo-preview');
+
+    const passwordToggle = document.getElementById('change-password-toggle');
+    const passwordFieldsContainer = document.getElementById('password-fields-container');
+
+    // --- Modal Control Functions ---
+    const openModal = () => {
+        modalOverlay.classList.add('active');
+        appContent.classList.add('blurred');
+    };
+
+    const closeModal = () => {
+        modalOverlay.classList.remove('active');
+        appContent.classList.remove('blurred');
+    };
+
+    // --- Event Listeners for Modal ---
+    if (openModalBtn) openModalBtn.addEventListener('click', openModal);
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    
+    // Close modal if user clicks on the overlay background
+    modalOverlay.addEventListener('click', (event) => {
+        if (event.target === modalOverlay) {
+            closeModal();
+        }
+    });
+
+    // --- Image Upload Preview Logic ---
+    if (photoUploadInput && photoPreview) {
+        photoUploadInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Create an image element to show the preview
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    
+                    // Clear previous preview and add the new one
+                    photoPreview.innerHTML = '';
+                    photoPreview.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // --- Password Fields Toggle Logic ---
+    if (passwordToggle && passwordFieldsContainer) {
+        passwordToggle.addEventListener('change', function() {
+            if (this.checked) {
+                passwordFieldsContainer.classList.add('visible');
+            } else {
+                passwordFieldsContainer.classList.remove('visible');
+            }
+        });
+    }
+});
+    </script>
+</body>
+</html>
