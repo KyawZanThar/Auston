@@ -7,6 +7,7 @@
     
     <!-- Link to your CSS files -->
     <link rel="stylesheet" href="../CSS/myaccount.css">
+    
     <link rel="stylesheet" href="../CSS/sidebar.css">
     <link rel="stylesheet" href="../CSS/topbar.css">
     
@@ -56,7 +57,8 @@
                                 </div>
                             </div>
                             <!-- This can link to a modal or another page for editing -->
-                            <button class="edit-profile-btn" id="editProfileBtn">Edit Profile</button>
+                            <!-- Change the ID to this -->
+<button class="edit-profile-btn" id="open-modal-btn">Edit Profile</button>
                         </article>
 
                         <!-- Quick Summary Cards (These are static links, but counts could be dynamic later) -->
@@ -80,7 +82,7 @@
 
                         <!-- Actions Section -->
                         <section class="action-buttons">
-                            <button class="action-btn change-password" id="changePasswordBtn">
+                            <button class="action-btn change-password" id="open-modal-btn">
                                 <i class="fas fa-lock"></i> Change Password
                             </button>
                             <button class="action-btn logout" id="logoutBtn">
@@ -95,121 +97,28 @@
             </div>
         </main>
     </div>
+
+<!-- In: myaccount.html (right before </body>) -->
+
+<!-- --- THIS IS THE NEW MODAL STRUCTURE --- -->
+<div id="iframe-modal" class="iframe-modal-overlay">
+        <!-- The close button lives OUTSIDE the iframe so our script can find it -->
+        <button id="iframe-close-btn" class="iframe-modal-close-btn" aria-label="Close">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        
+        <!-- The iframe will load your profile-edit.html page -->
+        <iframe src="../components/profile-edit.html" title="Edit Profile"></iframe>
+    </div>
+<div id="modal-container"></div>
 </body>
     <!-- SCRIPTS -->
     <script src="../config/appConfig.js"></script>
-    
+    <script src="../Javascript/profile-edit.js"></script>
 
-
-    <!-- SCRIPTS -->
-
-    <script>
-        // In: Frontend/Javascript/myaccount.js
-
-// In: Frontend/Javascript/myaccount.js
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Select elements that will display dynamic data
-    const profileEmail = document.getElementById('profile-email');
-    const profileUniversityId = document.getElementById('profile-university-id');
-    const profileRole = document.getElementById('profile-role');
-    const profileRegDate = document.getElementById('profile-reg-date');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    const changePasswordBtn = document.getElementById('changePasswordBtn');
-
-    // --- 1. Check for token and fetch user data ---
-    const token = localStorage.getItem('mock_token');
-    if (!token) {
-        // If no token is found, redirect to the login page
-        window.location.href = '/login.html'; // Adjust this path if needed
-        return;
-    }
-
-    // --- 2. Function to populate the profile fields ---
-    const populateProfileData = (user) => {
-        if (!user) {
-            console.error('User data is not available.');
-            return;
-        }
-        
-        profileEmail.textContent = user.email || 'N/A';
-        profileUniversityId.textContent = user.austonId ? `${user.austonId} (Read-Only)` : 'N/A';
-        profileRole.textContent = user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'N/A';
-        
-        // Format the registration date
-        if (user.createdAt) {
-            const date = new Date(user.createdAt);
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            profileRegDate.textContent = date.toLocaleDateString('en-US', options);
-        } else {
-            profileRegDate.textContent = 'N/A';
-        }
-    };
-
-    // --- 3. Fetch user profile from the backend ---
-    const fetchUserProfile = async () => {
-        try {
-            const response = await fetch(`${backendDomain}/api/users/profile`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Send the token for authentication
-                }
-            });
-
-            if (!response.ok) {
-                // If the token is invalid or expired, clear it and redirect to login
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('token');
-                    window.location.href = '/login.html';
-                }
-                throw new Error('Failed to fetch user profile.');
-            }
-
-            const user = await response.json();
-            populateProfileData(user);
-
-        } catch (error) {
-            console.error('Error fetching profile:', error);
-            // Optionally display an error message to the user
-        }
-    };
-
-    // --- 4. Event Listeners ---
-    
-    // Logout Button
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            // Remove the token and user data from local storage
-            localStorage.removeItem('token');
-            localStorage.removeItem('user'); // Also clear user object if you stored it
-            
-            // Redirect to the login page
-            window.location.href = '/login.html'; // Adjust path if needed
-        });
-    }
-
-    // Edit Profile Button (can redirect to an edit page or open a modal)
-    if (editProfileBtn) {
-        editProfileBtn.addEventListener('click', () => {
-            // For now, an alert. This could redirect to a settings page.
-            alert('Redirecting to the profile edit page is not yet implemented.');
-            // window.location.href = '/settings.html';
-        });
-    }
-    
-    // Change Password Button (can open a modal)
-    if (changePasswordBtn) {
-        changePasswordBtn.addEventListener('click', () => {
-            alert('The "Change Password" modal is not yet implemented.');
-        });
-    }
-
-    // --- 5. Initial call to fetch and display data ---
-    fetchUserProfile();
-});
-    </script> <!-- Link to the new JS file -->
+     <!-- Link to the new JS file -->
     <script src="../Javascript/componentUpload.js"></script>
-</body>
+   <script src="../Javascript/myaccount.js"></script>
+     
+
 </html>

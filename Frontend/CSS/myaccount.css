@@ -14,6 +14,42 @@ body {
     color: #1a1a1a; 
 }
 
+/* ... Your existing styles for the settings page ... */
+        
+        /* --- NEW STYLES FOR THE IFRAME MODAL --- */
+       /* In: myaccount.html (inside the <style> tag) */
+
+/* --- NEW STYLES FOR THE IFRAME MODAL --- */
+.iframe-modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* The blur/shadow effect */
+    backdrop-filter: blur(5px); /* Modern blur effect */
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0; /* Start invisible for fade-in effect */
+    transition: opacity 0.3s ease-in-out;
+}
+.iframe-modal-overlay.visible {
+    display: flex;
+    opacity: 1;
+}
+.iframe-modal-overlay iframe {
+    width: 100%;
+    max-width: 900px; /* Adjust width of the modal */
+    height: 90%;
+    max-height: 800px; /* Adjust height of the modal */
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
 a { text-decoration: none; color: inherit; }
 button { cursor: pointer; border: none; outline: none; background: none; font-family: inherit; }
 
@@ -32,6 +68,7 @@ button { cursor: pointer; border: none; outline: none; background: none; font-fa
     flex-grow: 1;
     overflow-y: auto; /* This allows the content to scroll */
     padding: 2rem;   /* Standard padding */
+    transition: padding 0.3s ease;
 }
 
 /* --- Profile Page Specific Styles --- */
@@ -64,6 +101,7 @@ button { cursor: pointer; border: none; outline: none; background: none; font-fa
     padding: 2rem;
     box-shadow: 0 4px 6px var(--shadow-color);
     position: relative;
+    transition: padding 0.3s ease;
 }
 
 .panel-title {
@@ -71,6 +109,7 @@ button { cursor: pointer; border: none; outline: none; background: none; font-fa
     font-size: 1.75rem;
     font-weight: 600;
     color: var(--primary-blue);
+    transition: font-size 0.3s ease;
 }
 
 .info-grid {
@@ -184,6 +223,7 @@ button { cursor: pointer; border: none; outline: none; background: none; font-fa
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--primary-blue);
+    transition: font-size 0.3s ease;
 }
 
 /* --- Actions Section --- */
@@ -229,27 +269,131 @@ button { cursor: pointer; border: none; outline: none; background: none; font-fa
     box-shadow: none;
 }
 
-/* --- Responsive Design --- */
+/* In: Frontend/CSS/myaccount.css (ADD THIS TO THE END) */
+
+/* --- Iframe Modal Styles --- */
+
+/* The main container that covers the screen */
+.iframe-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(9, 36, 79, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* --- THE CRITICAL FIX --- */
+    /* Hide it by default and make it unclickable */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* The state when the modal is visible */
+.iframe-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto; /* Make it clickable again */
+}
+
+/* Style the iframe itself */
+.iframe-modal-overlay iframe {
+    width: 90%;
+    max-width: 800px;
+    height: 90vh;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Style for the close button we will add */
+.iframe-modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1001; /* Ensure it's above the iframe */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+/*
+==============================================
+=========== RESPONSIVE DESIGN ================
+==============================================
+*/
+
+/* --- For Tablets and Smaller Laptops --- */
+@media (max-width: 992px) {
+    .content-area {
+        /* Reduce padding to give content more space */
+        padding: 1.5rem;
+    }
+}
+
+
+/* --- For Mobile Devices (Major Changes) --- */
 @media (max-width: 768px) {
     .main-content {
-        margin-left: 0; /* Sidebar might be hidden on mobile */
+        /* Remove the margin reserved for the sidebar, as it's likely hidden on mobile */
+        margin-left: 0;
     }
+
     .content-area {
-        padding: 1rem; /* Reduce padding on smaller screens */
+        /* Further reduce padding for small screens */
+        padding: 1rem;
     }
+
+    /* --- Account Panel Adjustments --- */
     .account-info-panel {
         padding: 1.5rem;
     }
+
+    .panel-title {
+        /* Make the main title slightly smaller to prevent awkward wrapping */
+        font-size: 1.5rem;
+    }
+
     .edit-profile-btn {
-        position: static; /* Stack the button on mobile */
+        /* Remove absolute positioning to place it in the normal document flow */
+        position: static;
+        
+        /* Make the button full-width for easy tapping */
         width: 100%;
+        
+        /* Add space between it and the info grid above */
         margin-top: 1.5rem;
+        padding: 0.85rem; /* Slightly increase padding for better touch target */
     }
+
+    /* --- Summary Card Adjustments --- */
     .summary-cards {
-        grid-template-columns: 1fr; /* Stack cards vertically */
+        /* Force the grid into a single column */
+        grid-template-columns: 1fr;
     }
+
+    .card-count {
+        /* Reduce the size of the large numbers to save space */
+        font-size: 2.25rem;
+    }
+
+    /* --- Action Button Adjustments --- */
     .action-buttons {
+        /* Stack the buttons vertically instead of side-by-side */
         flex-direction: column;
         gap: 0.75rem;
     }
 }
+
