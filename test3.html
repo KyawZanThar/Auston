@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auston Book - My Account</title>
+    
+    <!-- Link to your CSS files -->
+    <link rel="stylesheet" href="../CSS/myaccount.css">
+    <link rel="stylesheet" href="../CSS/sidebar.css">
+    <link rel="stylesheet" href="../CSS/topbar.css">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* In: Frontend/CSS/myaccount.css (ADD THIS TO THE END OF THE FILE) */
+
+/* --- Body state when modal is open --- */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* --- Modal Overlay and Content --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(9, 36, 79, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+    padding: 4px;
+}
+.close-btn:hover {
+    color: #000;
+}
+
+/* --- Modal Header --- */
+.modal-header {
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid #e1e5e9;
+}
+.modal-header h2 {
+    font-size: 1.5rem;
+    color: #09244F;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+.modal-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background-color: #FFCC08;
+}
+
+/* --- Modal Form Styles --- */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-grow: 1;
+}
+.form-main-content {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    overflow-y: auto;
+}
+.form-column {
+    flex: 1;
+    min-width: 0;
+}
+
+/* --- Modal Form Groups and Fields --- */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #09244F;
+    margin-bottom: 0.5rem;
+}
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #FFCC08;
+    box-shadow: 0 0 0 3px rgba(255, 204, 8, 0.3);
+}
+.form-group input[readonly] {
+    background-color: #f9fafb;
+    cursor: not-allowed;
+}
+
+/* --- Photo Upload --- */
+.photo-upload-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+.photo-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid #FFCC08;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9fafb;
+    overflow: hidden;
+}
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.camera-icon { color: #09244F; }
+
+/* --- Modal Footer and Buttons --- */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e1e5e9;
+    background-color: #f9fafb;
+}
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-save {
+    background-color: #09244F;
+    color: #ffffff;
+}
+.btn-save:hover {
+    box-shadow: 0 4px 15px rgba(9, 36, 79, 0.3);
+    transform: translateY(-2px);
+}
+.btn-cancel {
+    background-color: #ffffff;
+    color: #d9534f;
+    border: 1px solid #d9534f;
+}
+.btn-cancel:hover {
+    background-color: #fff5f5;
+}
+
+/* --- Modal Responsive Design --- */
+@media (max-width: 768px) {
+    .form-main-content {
+        flex-direction: column;
+        gap: 0;
+    }
+    .modal-footer {
+        flex-direction: column-reverse;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+    </style>
+</head>
+<body>
+   <div class="app">
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="content-area">
+                
+                <!-- START: Profile Content (This remains the same) -->
+                <div class="profile-main">
+                    <section class="profile-container">
+                        <article class="account-info-panel">
+                            <h2 class="panel-title">Account Information</h2>
+                            <div class="info-grid">
+                                <div class="info-item"><span class="info-label">Email</span><span class="info-value" id="profile-email">...</span></div>
+                                <div class="info-item"><span class="info-label">University ID</span><span class="info-value" id="profile-university-id">...</span></div>
+                                <div class="info-item"><span class="info-label">Department / Faculty</span><span class="info-value" id="profile-department">...</span></div>
+                                <div class="info-item"><span class="info-label">Role</span><span class="info-value" id="profile-role">...</span></div>
+                                <div class="info-item"><span class="info-label">Registration date</span><span class="info-value" id="profile-reg-date">...</span></div>
+                            </div>
+                            <button class="edit-profile-btn" id="open-modal-btn">Edit Profile</button>
+                        </article>
+                        <section class="summary-cards">
+                            <a href="#" class="summary-card"><i class="fas fa-bookmark card-icon"></i><span class="card-label">Bookmarks</span><span class="card-count">42</span></a>
+                            <a href="#" class="summary-card"><i class="fas fa-clock card-icon"></i><span class="card-label">Current Reading</span><span class="card-count">3</span></a>
+                            <a href="#" class="summary-card"><i class="fas fa-file-alt card-icon"></i><span class="card-label">Resources Accessed</span><span class="card-count">187</span></a>
+                        </section>
+                        <section class="action-buttons">
+                            <button class="action-btn change-password" id="changePasswordBtn"><i class="fas fa-lock"></i> Change Password</button>
+                            <button class="action-btn logout" id="logoutBtn">Logout <i class="fas fa-sign-out-alt"></i></button>
+                        </section>
+                    </section>
+                </div>
+                <!-- END: Profile Content -->
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- ================================================== -->
+    <!-- START: EDIT PROFILE MODAL (Add this entire block) -->
+    <!-- ================================================== -->
+    <div class="modal-overlay" id="profile-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+        <div class="modal-content">
+            <button class="close-btn" id="close-modal-btn" aria-label="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+
+            <header class="modal-header">
+                <h2 id="modal-title">Edit Your Profile</h2>
+            </header>
+
+            <form class="profile-form" id="edit-profile-form">
+                <div class="form-main-content">
+                    <!-- Left Column -->
+                    <div class="form-column">
+                        <div class="form-group photo-upload-area">
+                            <label for="photo-upload" class="photo-upload-label">
+                                <div class="photo-preview" id="photo-preview">
+                                    <svg class="camera-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                </div>
+                                <span>Change Photo</span>
+                            </label>
+                            <input type="file" id="photo-upload" accept="image/*" hidden>
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-email">Email Address</label>
+                            <input type="email" id="modal-email" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-first-name">First Name</label>
+                            <input type="text" id="modal-first-name" placeholder="Enter your first name">
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-last-name">Last Name</label>
+                            <input type="text" id="modal-last-name" placeholder="Enter your last name">
+                        </div>
+                    </div>
+                    <!-- Right Column -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="modal-student-id">Student/Staff ID</label>
+                            <input type="text" id="modal-student-id" placeholder="e.g., UN123456">
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-role">Role</label>
+                            <select id="modal-role">
+                                <option value="student">Student</option>
+                                <option value="faculty">Faculty</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-department">Department / Faculty</label>
+                            <select id="modal-department">
+                                <option value="cs">Computer Science & Engineering</option>
+                                <option value="business">Business School</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn btn-cancel" id="cancel-btn">Cancel</button>
+                    <button type="submit" class="btn btn-save">Save Changes</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+    <!-- END: EDIT PROFILE MODAL -->
+
+    <!-- SCRIPTS -->
+    <script src="../config/appConfig.js"></script>
+    <script src="../Javascript/componentUpload.js"></script>
+    <script>
+        // In: Frontend/Javascript/myaccount.js
+
+document.addEventListener('DOMContentLoaded', () => {
+    // --- 1. SELECTORS ---
+    // Main page elements
+    const profileEmail = document.getElementById('profile-email');
+    const profileUniversityId = document.getElementById('profile-university-id');
+    const profileRole = document.getElementById('profile-role');
+    const profileRegDate = document.getElementById('profile-reg-date');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Modal elements
+    const openModalBtn = document.getElementById('open-modal-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const modalOverlay = document.getElementById('profile-modal-overlay');
+    const editProfileForm = document.getElementById('edit-profile-form');
+    
+    // Modal form fields
+    const modalEmail = document.getElementById('modal-email');
+    const modalFirstName = document.getElementById('modal-first-name');
+    const modalLastName = document.getElementById('modal-last-name');
+    const modalStudentId = document.getElementById('modal-student-id');
+
+    let currentUserData = null; // To store fetched user data
+
+    // --- 2. MAIN PAGE DATA LOGIC ---
+    const token = localStorage.getItem('token'); // Using 'token' for consistency
+   
+
+    const populateProfileData = (user) => {
+        if (!user) return;
+        currentUserData = user; // Store data for later use in the modal
+        
+        profileEmail.textContent = user.email || 'N/A';
+        profileUniversityId.textContent = user.austonId ? `${user.austonId} (Read-Only)` : 'N/A';
+        profileRole.textContent = user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'N/A';
+        
+        if (user.createdAt) {
+            const date = new Date(user.createdAt);
+            profileRegDate.textContent = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        } else {
+            profileRegDate.textContent = 'N/A';
+        }
+    };
+
+    const fetchUserProfile = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/users/profile`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Failed to fetch profile');
+            const user = await response.json();
+            populateProfileData(user);
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                localStorage.clear();
+                window.location.href = '/login.html';
+            }
+        }
+    };
+
+    // --- 3. MODAL FUNCTIONALITY ---
+    const openModal = () => {
+        if (!currentUserData) return; // Don't open if data isn't loaded
+
+        // Populate modal with current user data
+        modalEmail.value = currentUserData.email || '';
+        modalFirstName.value = currentUserData.username || ''; // Assuming username is first name for now
+        modalLastName.value = ''; // Add this field to your backend if needed
+        modalStudentId.value = currentUserData.austonId || '';
+
+        modalOverlay.hidden = false;
+        document.body.classList.add('modal-open');
+        // Use a short delay to allow the modal to become visible before transitioning
+        setTimeout(() => {
+            modalOverlay.classList.add('active');
+            modalFirstName.focus(); // Auto-focus the first field
+        }, 10);
+    };
+
+    const closeModal = () => {
+        modalOverlay.classList.remove('active');
+        document.body.classList.remove('modal-open');
+        // Hide the modal completely after the transition ends
+        setTimeout(() => {
+            modalOverlay.hidden = true;
+        }, 300); // Must match the CSS transition duration
+    };
+
+    // --- 4. ACCESSIBILITY: FOCUS TRAPPING ---
+    const handleFocusTrap = (e) => {
+        if (e.key !== 'Tab') return;
+
+        const focusableElements = modalOverlay.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) { // Shift + Tab
+            if (document.activeElement === firstElement) {
+                lastElement.focus();
+                e.preventDefault();
+            }
+        } else { // Tab
+            if (document.activeElement === lastElement) {
+                firstElement.focus();
+                e.preventDefault();
+            }
+        }
+    };
+
+    // --- 5. EVENT LISTENERS ---
+    openModalBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+            closeModal();
+        }
+        if (modalOverlay.classList.contains('active')) {
+            handleFocusTrap(e);
+        }
+    });
+
+    editProfileForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // Here you would gather the form data and send a PATCH/PUT request to your backend
+        alert('Profile saved! (API call not implemented)');
+        closeModal();
+    });
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        });
+    }
+
+    // --- 6. INITIALIZATION ---
+    fetchUserProfile();
+});
+    </script> <!-- Link to the new JS file -->
+</body>
+</html>

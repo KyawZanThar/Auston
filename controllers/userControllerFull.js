@@ -147,50 +147,70 @@ const listUsers = async (req, res, next) => {
 // In: backend/controllers/userControllerFull.js
 
 // Replace your existing, placeholder 'updateProfile' function with this one
+// In: backend/controllers/userControllerFull.js
+
+// ... other imports (User, jwt, bcryptjs) ...
+// ... other functions (register, login, etc.) ...
+
+// --- REPLACE your existing 'updateProfile' function with this one ---
 const updateProfile = async (req, res, next) => {
     try {
-        // 1. Get the user ID from the authenticated token (provided by auth.js)
         const userId = req.user.id;
-        
-        // 2. Get the new username from the form data
-        const { username } = req.body;
+        // Get fields from the form data
+        const { username, newPassword, currentPassword } = req.body;
 
-        // 3. Prepare an object with the data to be updated
-        const updateData = {};
-        if (username) {
-            updateData.username = username;
-        }
-
-        // 4. Check if a new avatar file was uploaded by the 'uploadImage' middleware
-        if (req.file) {
-            // The path should be what the browser will use to access the file
-            updateData.avatarUrl = `/avatars/${req.file.filename}`;
-        }
-
-        // 5. Find the user by their ID and update their data in the database
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { $set: updateData },
-            { new: true, runValidators: true } // 'new: true' returns the updated document
-        ).select('-password'); // Exclude the password from the response
-
-        if (!updatedUser) {
+        // Find the user in the database
+        const user = await User.findById(userId);
+        if (!user) {
             return res.status(404).json({ message: 'User not found.' });
         }
-        
-        // 6. Create a NEW token with the updated user information
+
+        // --- 1. Update General Information ---
+        if (username) {
+            user.username = username;
+        }
+
+        // --- 2. Handle Avatar Upload ---
+        if (req.file) {
+            // The path should be what the browser will use to access the file
+            // Make sure your server is configured to serve static files from the 'uploads' folder
+            user.avatarUrl = `/avatars/${req.file.filename}`;
+        }
+
+        // --- 3. Handle Password Change (if fields are provided) ---
+        if (newPassword && currentPassword) {
+            // Assumes you have a comparePassword method on your User model
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                // To prevent data loss, we stop here if the password is wrong
+                return res.status(400).json({ message: 'Incorrect current password. No changes were saved.' });
+            }
+            if (newPassword.length < 6) {
+                return res.status(400).json({ message: 'New password must be at least 6 characters.' });
+            }
+            // The pre-save hook in your User model will automatically hash this new password before saving
+            user.password = newPassword;
+        } else if (newPassword && !currentPassword) {
+            // Handle case where new password is sent without the current one
+            return res.status(400).json({ message: 'Please provide your current password to set a new one.' });
+        }
+
+        // --- 4. Save all changes to the database ---
+        const updatedUser = await user.save();
+
+        // --- 5. Create a NEW token with the updated user information ---
         const payload = {
             id: updatedUser.id,
             role: updatedUser.role,
-            austonId: updatedUser.austonId,
-            email: updatedUser.email,
             username: updatedUser.username,
-            avatarUrl: updatedUser.avatarUrl // Include the new avatar URL
+            avatarUrl: updatedUser.avatarUrl,
+            email: updatedUser.email,
+            austonId: updatedUser.austonId
         };
         const token = jwt.sign(payload, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '2h' });
 
-        // 7. Send the new token and the updated user object back to the frontend
-        res.json({
+        // --- 6. Send back the new token and updated user object ---
+        res.status(200).json({
             message: 'Profile updated successfully.',
             token: token,
             user: payload
@@ -198,9 +218,60 @@ const updateProfile = async (req, res, next) => {
 
     } catch (err) {
         console.error("Error during profile update:", err.message);
+        // Handle potential errors, like file upload issues
         next(err);
     }
 };
+
+// --- Make sure to export the updated function ---
+module.exports = {
+    // ... your other exports (register, login, etc.) ...
+    updateProfile,
+    // ...
+};
+// In: backend/controllers/userControllerFull.js
+
+// ... your other functions (register, login, etc.) ...
+
+// --- ADD THIS NEW FUNCTION ---
+const changePassword = async (req, res, next) => {
+    try {
+        // 1. Get the data from the form
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user.id;
+
+        // 2. Basic validation
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: 'Current and new passwords are required.' });
+        }
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: 'New password must be at least 6 characters long.' });
+        }
+
+        // 3. Find the user in the database
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // 4. Verify the CURRENT password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect current password.' });
+        }
+
+        // 5. Hash and save the NEW password
+        // The pre-save hook in your User.js model will handle the hashing automatically.
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: 'Password updated successfully.' });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
 // Placeholder functions for any other routes you might have
 
 const deleteUser = async (req, res, next) => { res.status(501).json({ message: 'Not implemented yet.' }); };
@@ -214,5 +285,6 @@ module.exports = {
     profile,
     listUsers,
     updateProfile,
-    deleteUser
+    deleteUser,
+    changePassword
 };

@@ -1,0 +1,157 @@
+<!-- In: Frontend/components/profile-edit.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile Form</title>
+    
+    <!-- Link to its own dedicated CSS file -->
+    <link rel="stylesheet" href="../CSS/profile-edit.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Main wrapper for all content inside the iframe -->
+    <div class="modal-container">
+        
+        <!-- Close Button (Controlled by parent, but good to have) -->
+        <!-- Modal Header -->
+        <header class="modal-header">
+            <h2 id="modal-title">Edit Your Profile</h2>
+        </header>
+
+        <!-- Main Form Content -->
+        <form class="profile-form" id="edit-profile-form">
+            <div class="form-main-content">
+                
+                <!-- Left Column: General Info -->
+                <div class="form-column">
+                    <div class="form-group photo-upload-area">
+                        <label for="photo-upload" class="photo-upload-label">
+                            <div class="photo-preview" id="photo-preview">
+                                <svg class="camera-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            </div>
+                            <span>Change Photo</span>
+                        </label>
+                        <input type="file" id="photo-upload" name="avatar" accept="image/*" hidden>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" value="user.name@university.edu" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="first-name">First Name</label>
+                        <input type="text" id="first-name" name="firstName" placeholder="Enter your first name">
+                    </div>
+                    <div class="form-group">
+                        <label for="last-name">Last Name</label>
+                        <input type="text" id="last-name" name="lastName" placeholder="Enter your last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="student-id">Student/Staff ID</label>
+                        <input type="text" id="student-id" name="studentId" placeholder="e.g., UN123456">
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <select id="role" name="role">
+                            <option value="student" selected>Student</option>
+                            <option value="faculty">Faculty</option>
+                            <option value="staff">Staff</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department / Faculty</label>
+                        <select id="department" name="department">
+                            <option value="cs" selected>Computer Science & Engineering</option>
+                            <option value="business">Business School</option>
+                            <option value="arts">Arts & Humanities</option>
+                        </select>
+                    </div>
+                </div>
+
+               <!-- Right Column (Updated) -->
+                <div class="form-column">
+                    <h3>Security & Access</h3>
+                    <div class="form-group toggle-group">
+                        <label for="change-password-toggle">Change Password</label>
+                        <label class="switch">
+                            <input type="checkbox" id="change-password-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- THIS IS THE UPDATED SECTION -->
+                    <div class="password-fields" id="password-fields-container">
+                        <!-- ADDED: Current Password Field -->
+                        <div class="form-group">
+                            <label for="current-password">Current Password</label>
+                            <input type="password" id="current-password" name="currentPassword" placeholder="Enter your current password">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password">New Password</label>
+                            <input type="password" id="new-password" name="newPassword" placeholder="Enter a new password">
+                        </div>
+                    </div>
+                    <!-- END OF UPDATED SECTION -->
+
+                    <div class="form-group toggle-group">
+                        <label for="special-access-toggle">Enable Special Access</label>
+                        <label class="switch">
+                            <input type="checkbox" id="special-access-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                   <!-- In: Frontend/components/profile-edit.html -->
+
+<!-- In: Frontend/components/profile-edit.html -->
+
+<!-- ... inside the "Right Column" ... -->
+
+<div class="form-group connect-account-area">
+    <!-- START: REPLACEMENT BLOCK -->
+    <div class="connect-info">
+        <!-- NEW: Microsoft Logo SVG Icon (Four Squares) -->
+        <svg class="microsoft-logo-icon" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+            <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+            <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+            <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+        </svg>
+        <!-- NEW: Updated Text -->
+        <span>Connect your Microsoft Account</span>
+    </div>
+    <button type="button" class="connect-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>
+        <!-- NEW: Updated Button Text -->
+        Connect Microsoft Account
+    </button>
+    <!-- END: REPLACEMENT BLOCK -->
+</div>
+
+<!-- ... rest of the right column ... -->
+<!-- ... rest of the right column ... -->
+                </div>
+            </div>
+
+            <!-- Modal Footer with Action Buttons -->
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-cancel" id="cancel-btn-iframe">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-save">Save Changes</button>
+            </footer>
+        </form>
+    </div>
+
+    <!-- Link to its own dedicated script -->
+    <script src="../Javascript/profile-edit.js"></script>
+</body>
+</html>

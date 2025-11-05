@@ -142,3 +142,50 @@
     background-color: #e5e7eb;
     margin: 4px 0;
 }
+
+/* --- Responsive Design for Top Bar --- */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.is-open {
+        transform: translateX(0);
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    /* --- ADJUSTED: Toggle Button is now a flex item --- */
+    .sidebar-toggle {
+        display: flex; /* Make it visible on mobile */
+        flex-direction: column;
+        justify-content: space-around;
+        width: 24px;
+        height: 20px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 1001;
+        /* REMOVED: position, top, and left properties */
+    }
+
+    .sidebar-toggle span {
+        width: 100%;
+        height: 2px;
+        background: #09244F;
+        border-radius: 3px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .sidebar-toggle.is-active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .sidebar-toggle.is-active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .sidebar-toggle.is-active span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -5px);
+    }
+}

@@ -24,6 +24,15 @@ router.post('/login', userCtrl.login);
 router.get('/profile', auth.authenticate, userCtrl.profile);
 router.patch('/profile', auth.authenticate, uploadImage.single('avatar'), userCtrl.updateProfile);
 
+// In: backend/routes/user.js
+
+// ... your other routes ...
+
+// --- ADD THIS NEW ROUTE ---
+// Handles changing the user's password.
+router.patch('/change-password', auth.authenticate, userCtrl.changePassword);
+
+
 
 // Admin-only routes (require token AND 'admin' role)
 // This is the line that was causing the crash. It is now clean.
