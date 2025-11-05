@@ -1,7 +1,6 @@
 // In: Frontend/Javascript/profile-edit.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Element Selections (for elements INSIDE this page) ---
     const photoUploadInput = document.getElementById('photo-upload');
     const photoPreview = document.getElementById('photo-preview');
     const passwordToggle = document.getElementById('change-password-toggle');
@@ -11,24 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementById('close-btn-iframe');
 
     // --- Image Upload Preview Logic ---
-    if (photoUploadInput && photoPreview) {
+    if (photoUploadInput) {
         photoUploadInput.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = (e) => {
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     photoPreview.innerHTML = '';
                     photoPreview.appendChild(img);
-                }
+                };
                 reader.readAsDataURL(file);
             }
         });
     }
 
     // --- Password Fields Toggle Logic ---
-    if (passwordToggle && passwordFieldsContainer) {
+    if (passwordToggle) {
         passwordToggle.addEventListener('change', function() {
             passwordFieldsContainer.classList.toggle('visible', this.checked);
         });
@@ -36,29 +35,31 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- Form Submission Logic ---
     if (profileForm) {
-        profileForm.addEventListener('submit', async (e) => {
+        profileForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            
+            // 1. Gather all the form data
             const formData = new FormData(profileForm);
             
-            // Example of how you would send this to your Express backend
-            // const response = await fetch('/api/users/profile', {
-            //     method: 'PATCH',
-            //     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-            //     body: formData
-            // });
-            // const result = await response.json();
-            
-            alert('Form submitted! (Backend integration needed)');
-            // Tell the parent window to close the modal
-            window.parent.postMessage('closeModal', '*');
+            // 2. Convert FormData to a plain object to send via postMessage
+            const formDataObject = {};
+            formData.forEach((value, key) => {
+                formDataObject[key] = value;
+            });
+
+            // 3. Send a message to the PARENT window, asking it to submit the data
+            // We include the form data in the message.
+            window.parent.postMessage({
+                type: 'submitProfileUpdate',
+                payload: formDataObject
+            }, '*'); // Use a specific origin in production for security
         });
     }
 
+
     // --- Communication with Parent Page to Close Modal ---
     const closeTheModal = () => {
-        // This sends a message to the parent window (myaccount.html)
-        // The parent's script must be listening for this message to close the modal.
-        window.parent.postMessage('closeModal', '*');
+        window.parent.postMessage({ type: 'closeModal' }, '*');
     };
 
     if (cancelBtn) cancelBtn.addEventListener('click', closeTheModal);

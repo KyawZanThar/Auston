@@ -41,25 +41,71 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // 4. Attach all the event listeners
-        openModalBtn.addEventListener('click', openModal);
-        closeModalBtn.addEventListener('click', closeModal);
-
-        // Listener to close the modal with the 'Escape' key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && iframeModal.classList.contains('active')) {
-                closeModal();
-            }
-        });
+         openModalBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && iframeModal.classList.contains('active')) closeModal();
+    });
 
     } else {
         // This warning is helpful for debugging if the HTML changes
         console.warn("Modal elements not found. Modal functionality will be disabled.");
     }
 
-    // ==========================================================
-    // --- END: IFRAME MODAL LOGIC ---
-    // ==========================================================
-    // --- 2. Function to populate the profile fields ---
+    // --- NEW: LISTENER FOR MESSAGES FROM THE IFRAME ---
+    window.addEventListener('message', async (event) => {
+        if (event.origin !== window.location.origin) return;
+
+        const message = event.data;
+
+        if (message.type === 'closeModal') {
+            closeModal();
+        } 
+        
+        else if (message.type === 'submitProfileUpdate') {
+            // The iframe has sent us the form data. Now WE will send it to the backend.
+            const formData = new FormData();
+            
+            // Reconstruct FormData from the object the iframe sent
+            for (const key in message.payload) {
+                formData.append(key, message.payload[key]);
+            }
+            
+            // Find the file input in the iframe's document and append the file
+            const iframeDocument = iframeModal.querySelector('iframe').contentDocument;
+            const fileInput = iframeDocument.getElementById('photo-upload');
+            if (fileInput && fileInput.files[0]) {
+                formData.append('avatar', fileInput.files[0]);
+            }
+
+            try {
+                const response = await fetch(`${backendDomain}/api/users/profile`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}` // The PARENT has the token!
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || 'Update failed.');
+
+                // --- SUCCESS ---
+                alert('Profile updated successfully!');
+                localStorage.setItem('token', result.token);
+                localStorage.setItem('user', JSON.stringify(result.user));
+                
+                // Refresh the main page display with the new data
+                populateProfileData(result.user); 
+                
+                closeModal();
+
+            } catch (error) {
+                console.error('Update failed:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+    });
     const populateProfileData = (user) => {
         if (!user) {
             console.error('User data is not available.');
